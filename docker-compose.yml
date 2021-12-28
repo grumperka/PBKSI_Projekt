@@ -1,0 +1,40 @@
+version: '3'
+services:
+  web:
+    container_name: dockernodemongoapp
+    hostname: localhost
+    build: ./web-site
+    command: node myServer.js
+    ports:
+      - 8080:8080
+    volumes:
+      - ./web-site:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo
+    networks:
+      - wewnetrzna_siec
+
+  mongo:
+    image: mongo:3.6.17
+    container_name: mongo
+    ports:
+      - 27017:27017
+    networks:
+      - wewnetrzna_siec
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
+    networks:
+      - wewnetrzna_siec
+
+networks:
+  wewnetrzna_siec:
+    external: true    

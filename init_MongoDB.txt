@@ -1,0 +1,44 @@
+NALEZY OTWORZYC MONGODB CLI I WYKONAC PONIZSZE INSTRUKCJE
+
+mongo
+////////////////////////////
+use mydb
+///////////////////////////
+db.potrawy.insertMany([ 
+	{ nazwa: "Tatar wolowy podwedzany", cena: "39 zl", info: "Z sosem kaparowym i marynowanymi borowikami", kategoria: "Przystawki", status: "Dostepne"},
+	{ nazwa: "Tatar z lososia", cena: "36 zl", info: "Z sosem miodowo-musztardowym i jajkiem przepiorczym", kategoria: "Przystawki", status: "Na zamowienie"},
+	{ nazwa: "Grillowane warzywne antipasti", cena: "26 zl", info: "Baklazan, cukinia, papryka, karczochy oraz marynowane mini cebulki", kategoria: "Przystawki", status: "Dostepne"},
+	
+	{ nazwa: "Krem z pomidorow", cena: "19 zl", info: "Z parmezanem i grzankami", kategoria: "Zupy", status: "Dostepne"},
+	{ nazwa: "Prowansalska zupa rybna", cena: "21 zl", info: "Z sosem rouille i grzankami", kategoria: "Zupy", status: "Niedostepne"},
+	{ nazwa: "Zupa cebulowa", cena: "18 zl", info: "A zapiekana grzanka z serem gruyere", kategoria: "Zupy", status: "Dostepne"},
+	
+	{ nazwa: "Salatka grecka", cena: "28 zl", info: "Pomidor, ogorek zielony, papryka, salata, cebula, oliwki, ser feta", kategoria: "Salaty", status: "Dostepne"},
+	{ nazwa: "Salatka ceasar z grillowanymi krewetkami", cena: "39 zl", info: "Salata rzymska z platkami parmezanu, z grillowanymi krewetkami, dressingiem Caesar i grzankami", kategoria: "Salaty", status: "Na zamowienie"},
+	{ nazwa: "Salatka paryska", cena: "33 zl", info: "Mieszana salata z grzankami, kozim serem, gruszka i prazonymi orzechami", kategoria: "Salaty", status: "Dostepne"},
+	
+	{ nazwa: "Spaghetti Bolognese", cena: "28 zl", info: "Z sosem miesno-pomidorowym i parmezanem", kategoria: "Makarony", status: "Dostepne"},
+	{ nazwa: "Spaghetti Carbonara", cena: "29 zl", info: "Z parmezanowym zabaglione i chipsem z prosciutto crudo", kategoria: "Makarony", status: "Na zamowienie"},
+	{ nazwa: "Penne al Forno", cena: "30 zl", info: "Z kurczakiem, feta, brokulami i rozowym sosem", kategoria: "Makarony", status: "Dostepne"},
+	
+	{ nazwa: "Grillowana poledwiczka wieprzowa", cena: "48 zl", info: "Na borowikach z kluseczkami gnocchi", kategoria: "Miesa", status: "Dostepne"},
+	{ nazwa: "Rumiana kaczka z pieca", cena: "52 zl", info: "Podawana na buraczkach z pieczonymi ziemniaczkami", kategoria: "Miesa", status: "Na zamowienie"},
+	{ nazwa: "Filletto di Pollo al Salve", cena: "37 zl", info: "Piers z kurczaka z sosem szalwiowo-pomidorowym, pieczonymi ziemniakami i mieszana salata", kategoria: "Miesa", status: "Niedostepne"},
+	
+	{ nazwa: "Chrupiace placuszki ziemniaczane", cena: "42 zl", info: "Z wedzonym lososiem, jajkiem przepiorczym, kawiorem i dipem ziolowym", kategoria: "Ryby i owoce morza", status: "Na zamowienie"},
+	{ nazwa: "Krewetki tygrynie", cena: "56 zl", info: "Z sosem czosnkowo-maslanym i ziolowa bagietka", kategoria: "Ryby i owoce morza", status: "Dostepne"},
+	{ nazwa: "Fritto misto", cena: "48 zl", info: "Chrupiace kalmary, krewetki, panierowana ryba z sosem czosnkowym aioli i pieczonymi ziemniakami", kategoria: "Ryby i owoce morza", status: "Na zamowienie"},
+	
+	{ nazwa: "Panna Cotta", cena: "17 zl", info: "Z sosem malinowym lub czekoladowym", kategoria: "Desery", status: "Dostepne"},
+	{ nazwa: "Czekoladowy Fondant", cena: "19 zl", info: "Podawany na goraco z lodami waniliowymi", kategoria: "Desery", status: "Na zamowienie"},
+	{ nazwa: "Tort bezowy", cena: "20 zl", info: "Z delikatnym kremem kakaowym", kategoria: "Desery", status: "Na zamowienie"},
+	
+	{ nazwa: "Lizaki drobiowe", cena: "19 zl", info: "Panierowane w panco z surowka z marchewki i frytkami", kategoria: "Dla dzieci", status: "Dostepne"},
+	{ nazwa: "Nalesniki", cena: "15 zl", info: "Z serkiem waniliowym i sosem malinowym", kategoria: "Dla dzieci", status: "Dostepne"},
+	{ nazwa: "Paluszki z dorsza", cena: "19 zl", info: "w chrupiacej panierce z ziemniaczanym puree i surowka z marchewki", kategoria: "Dla dzieci", status: "Dostepne"}
+])
+///////////////////////////
+db.users.insertMany([
+		{	email: "admin@mail.com",	pswd: "password"	},
+		{	email: "user@mail.com",	pswd: "password"	}
+])
