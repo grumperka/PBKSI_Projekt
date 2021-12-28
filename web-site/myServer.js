@@ -27,7 +27,6 @@ app.listen(8080, function () {
 app.get('/', (req, resp) => {
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
-
 			app.result = response.data;
 			console.log("Response received!");
 
@@ -36,7 +35,6 @@ app.get('/', (req, resp) => {
 			}
 			else
 				resp.render('index.ejs', { potrawy: app.result, logged: false });
-
 		})
 		.catch(error => {
 			console.log(error);
@@ -44,234 +42,180 @@ app.get('/', (req, resp) => {
 });
 
 app.get('/przystawki', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
+	axios.get('http://localhost:8080/allCategoryApi/Przystawki')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Przystawki" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/zupy', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Zupy" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Zupy')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/salaty', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Salaty" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Salaty')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/makarony', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Makarony" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Makarony')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/miesa', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Miesa" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			//if(err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Miesa')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/owoceMorza', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Ryby i owoce morza" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Ryby%20i%20owoce%20morza')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 
 app.get('/desery', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Desery" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Desery')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/dlaDzieci', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ kategoria: "Dla dzieci" }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allCategoryApi/Dla%20dzieci')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/dostepne', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ status: "Dostepne" }, { nazwa: 1, cena: 1, kategoria: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allStatusApi/Dostepne')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/niedostepne', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ status: "Niedostepne" }, { nazwa: 1, cena: 1, kategoria: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allStatusApi/Niedostepne')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/naZamowienie', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-
-		var dbo = db.db("mydb");
-		dbo.collection("potrawy").find({ status: "Na zamowienie" }, { nazwa: 1, cena: 1, kategoria: 1 }).toArray(function (err, result) {
-			if (err) throw err;
-			//console.log(result);
-
-			app.result = result;
+	axios.get('http://localhost:8080/allStatusApi/Na%20zamowienie')
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
-
-			db.close();
-		});
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});	
 });
 
 app.get('/logOut', function (req, resp) {
@@ -361,22 +305,22 @@ app.post('/loginTo', (req, resp) => {
 
 
 app.route('/show/:id').get((req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-		var dbo = db.db("mydb");
-		var ObjectId = require('mongodb').ObjectID;
 		var id1 = req.params.id;
 
-		dbo.collection("potrawy").find(ObjectId(id1)).toArray(function (err, res) {
-			if (err) return console.log("Error: " + err);
-			console.log("Wyswietlamy szczegoly potrawy!");
+		axios.get('http://localhost:8080/potrawaApi/'+id1)
+		.then(response => {
+			app.result = response.data;
+			console.log("Response received!");
 
 			if (req.session.email) {
-				resp.render('show.ejs', { potrawy: res, logged: true });
+				resp.render('show.ejs', { potrawy: app.result, logged: true });
 			}
-			else resp.render('show.ejs', { potrawy: res, logged: false });
-		});
-	});
+			else resp.render('show.ejs', { potrawy: app.result, logged: false });
+		})
+		.catch(error => {
+			console.log(error);
+		});	
+
 });
 
 app.get('/delete/:id', (req, resp) => {
@@ -404,22 +348,22 @@ app.get('/delete/:id', (req, resp) => {
 
 app.route('/edit/:id')
 	.get((req, resp) => {
-		MongoClient.connect(url, function (err, db) {
-			if (err) throw err;
-			var dbo = db.db("mydb");
-			var ObjectId = require('mongodb').ObjectID;
-			var id1 = req.params.id;
-
-			dbo.collection("potrawy").find(ObjectId(id1)).toArray(function (err, res) {
-				if (err) return console.log("Error: " + err);
 				console.log("Edytujemy potrawe!");
-				if (req.session.email) {
-					resp.render('edit.ejs', { potrawy: res });
-				} else {
-					resp.sendFile(path.join(__dirname + '/views/login.html'));
-				}
-			});
-		});
+				var id1 = req.params.id;
+				axios.get('http://localhost:8080/potrawaApi/'+id1)
+				.then(response => {
+					app.result = response.data;
+					console.log("Response received!");
+		
+					if (req.session.email) {
+						resp.render('edit.ejs', { potrawy: app.result });
+					} else {
+						resp.sendFile(path.join(__dirname + '/views/login.html'));
+					}
+				})
+				.catch(error => {
+					console.log(error);
+				});			
 	})
 
 	.post((req, res) => {
