@@ -220,7 +220,7 @@ app.get('/naZamowienie', (req, resp) => {
 		});
 });
 
-app.get('/logOut', function (req, resp) {
+app.get('/logOut', function (req, resp) {  /*  */
 	req.session.destroy(function (err) {
 		if (err) {
 			console.log(err);
@@ -230,11 +230,11 @@ app.get('/logOut', function (req, resp) {
 	});
 });
 
-/*  */
-app.get('/login.html', (req, resp) => {
+
+app.get('/login.html', (req, resp) => {  /*  */
 	resp.sendFile(path.join(__dirname + '/views/login.html'));
 });
-/*  */
+
 
 app.post('/potrawy', (req, resp) => {
 	if (req.session.email) {
@@ -248,16 +248,16 @@ app.post('/potrawy', (req, resp) => {
 			status: req.body.status
 		};
 
-		fetch('http://localhost:8080/potrawyApi', {
+		fetch('http://localhost:8080/addPotrawyApi', {
 			method: 'POST',
 			body: JSON.stringify(zmienna),
 			headers: { 'Content-Type': 'application/json' }
 		})
-		.then(res => res.json())
-		.then(json => console.log(json))
-		.catch(error => {
-			console.log(error);
-		});
+			.then(res => res.json())
+			.then(json => console.log(json))
+			.catch(error => {
+				console.log(error);
+			});
 
 		if (req.session.email) {
 			resp.render('index.ejs', { potrawy: app.result, logged: true });
@@ -272,7 +272,7 @@ app.post('/potrawy', (req, resp) => {
 
 
 
-app.post('/loginTo', (req, resp) => {
+app.post('/loginTo', (req, resp) => {  /*  */
 	MongoClient.connect(url, function (err, db) {
 		if (err) throw err;
 
@@ -280,7 +280,6 @@ app.post('/loginTo', (req, resp) => {
 		dbo.collection("users").findOne({ email: req.body.email, pswd: req.body.pswd }, function (err, result) {
 			if (err) throw err;
 			if (result) {
-				//console.log(result);
 
 				req.session.email = req.body.email;
 				req.session.pswd = req.body.pswd;
@@ -321,26 +320,22 @@ app.route('/show/:id').get((req, resp) => {
 });
 
 app.get('/delete/:id', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
-		var dbo = db.db("mydb");
-		var ObjectId = require('mongodb').ObjectID;
-		var id1 = { _id: ObjectId(req.params.id) };
 
-		if (req.session.email) {
-			dbo.collection("potrawy").deleteOne(id1, function (err, res) {
-				if (err) throw err;
-				console.log("Usunieto potrawe!");
+	if (req.session.email) {
+
+		axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
+			.then(response => {
+				console.log(response.data);
+
 				resp.redirect('/');
-				resp.end();
-				db.close();
+			})
+			.catch(error => {
+				console.log(error);
 			});
-		} else {
-			resp.sendFile(path.join(__dirname + '/views/login.html'));
-		}
 
-
-	});
+	} else {
+		resp.sendFile(path.join(__dirname + '/views/login.html'));
+	}
 });
 
 app.route('/edit/:id')
@@ -363,37 +358,32 @@ app.route('/edit/:id')
 			});
 	})
 
-	.post((req, res) => {
-		MongoClient.connect(url, function (err, db) {
-			if (err) throw err;
+	.post((req, res) => { 
+		if (req.session.email) {
+			var zmienna =
+			{
+				id: req.params.id,
+				nazwa: req.body.nazwa,
+				cena: req.body.cena,
+				info: req.body.info,
+				kategoria: req.body.kategoria,
+				status: req.body.status
+			};
 
-
-			var dbo = db.db("mydb");
-			var ObjectId = require('mongodb').ObjectID;
-			var id = req.params.id;
-			var nazwa = req.body.nazwa;
-			var cena = req.body.cena;
-			var info = req.body.info;
-			var kategoria = req.body.kategoria;
-			var status = req.body.status;
-
-			dbo.collection("potrawy").updateMany({
-				_id: ObjectId(id)
-			}, {
-				$set: {
-					nazwa: nazwa,
-					cena: cena,
-					info: info,
-					kategoria: kategoria,
-					status: status
-				}
-			}, (err, result) => {
-				if (err) return res.send(err);
-
-				res.redirect('/');
-
-				console.log("Udalo sie ");
+			fetch('http://localhost:8080/editPotrawyApi', {
+				method: 'POST',
+				body: JSON.stringify(zmienna),
+				headers: { 'Content-Type': 'application/json' }
 			})
+				.then(res => res.json())
+				.then(
+					res.redirect('/')
+				)
+				.catch(error => {
+					console.log(error);
+				});
 
-		});
+		} else {
+			resp.sendFile(path.join(__dirname + '/views/login.html'));
+		}
 	});

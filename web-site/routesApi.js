@@ -73,7 +73,7 @@ module.exports = function (app) {
         });
     });
 
-    app.route("/potrawyApi").post(function (req, resp) {
+    app.route("/addPotrawyApi").post(function (req, resp) {
         MongoClient.connect(url, function (err, db) {
             if (err) throw err;
 
@@ -81,48 +81,85 @@ module.exports = function (app) {
 
             var zmienna =
             {
-                    nazwa: req.body.nazwa,
-                    cena: req.body.cena,
-                    info: req.body.info,
-                    kategoria: req.body.kategoria,
-                    status: req.body.status
+                nazwa: req.body.nazwa,
+                cena: req.body.cena,
+                info: req.body.info,
+                kategoria: req.body.kategoria,
+                status: req.body.status
             };
 
             app.result.push(zmienna);
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").insertOne(zmienna, function (err, res) {
-                    if (err) throw err;
-                    console.log("Dodano nowa potrawe!");
+                if (err) throw err;
+                console.log("Dodano nowa potrawe!");
 
-                    resp.json("OK");
-                    resp.end();
-                    db.close();
-                });
-            
+                resp.json("OK");
+                resp.end();
+                db.close();
+            });
+
         });
     });
 
-    savePotrawa = function (potrawa){
+    app.route('/deletePotrawyApi/:id').get(function (req, resp) {
         MongoClient.connect(url, function (err, db) {
             if (err) throw err;
             var dbo = db.db("mydb");
             console.log("API");
-    
-            if(potrawa == null){
-                console.log(potrawa);
-            
-            
-    
-            app.result.push(potrawa);
-    
-                dbo.collection("potrawy").insertOne(potrawa, function (err, res) {
-                    if (err) throw err;
-                    console.log("Dodano nowa potrawe!");
-                    db.close();
-                });
-            } else {console.log("NULL");}
+            var ObjectId = require('mongodb').ObjectID;
+            var id1 = { _id: ObjectId(req.params.id) };
+
+            dbo.collection("potrawy").deleteOne(id1, function (err, res) {
+                if (err) throw err;
+
+                console.log("Usunieto potrawe!");
+
+                resp.json("OK");
+                resp.end();
+                db.close();
+            });
         });
-    }
+    });
+
+    app.route("/editPotrawyApi").post(function (req, resp) {
+        MongoClient.connect(url, function (err, db) {
+            if (err) throw err;
+
+            console.log(req.body.id);
+
+            var ObjectId = require('mongodb').ObjectID;
+
+            var zmienna =
+            {
+                id: req.body.id,
+                nazwa: req.body.nazwa,
+                cena: req.body.cena,
+                info: req.body.info,
+                kategoria: req.body.kategoria,
+                status: req.body.status
+            };
+
+            var dbo = db.db("mydb");
+
+            dbo.collection("potrawy").updateMany({
+				_id: ObjectId(zmienna.id)
+			}, {
+				$set: {
+					nazwa: zmienna.nazwa,
+					cena: zmienna.cena,
+					info: zmienna.info,
+					kategoria: zmienna.kategoria,
+					status: zmienna.status
+				}
+			}, (err, result) => {
+				if (err) return res.send(err);
+
+			});
+
+        });
+    });;
+
 }
 
