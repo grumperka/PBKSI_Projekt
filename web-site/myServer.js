@@ -2,13 +2,14 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const fetch = require('node-fetch');
 var fs = require('fs');
 var path = require('path');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
 app.result = [];
-let routes = require("./routesApi.js");
+const routes = require("./routesApi.js");
 routes(app);
 
 var MongoClient = require('mongodb').MongoClient;
@@ -17,6 +18,7 @@ var url = "mongodb://mongo:27017/mydb";
 
 app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: false }));
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
@@ -54,7 +56,7 @@ app.get('/przystawki', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/zupy', (req, resp) => {
@@ -70,7 +72,7 @@ app.get('/zupy', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/salaty', (req, resp) => {
@@ -86,7 +88,7 @@ app.get('/salaty', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/makarony', (req, resp) => {
@@ -102,7 +104,7 @@ app.get('/makarony', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/miesa', (req, resp) => {
@@ -118,7 +120,7 @@ app.get('/miesa', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/owoceMorza', (req, resp) => {
@@ -134,7 +136,7 @@ app.get('/owoceMorza', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 
@@ -151,7 +153,7 @@ app.get('/desery', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/dlaDzieci', (req, resp) => {
@@ -167,7 +169,7 @@ app.get('/dlaDzieci', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/dostepne', (req, resp) => {
@@ -183,7 +185,7 @@ app.get('/dostepne', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/niedostepne', (req, resp) => {
@@ -199,7 +201,7 @@ app.get('/niedostepne', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/naZamowienie', (req, resp) => {
@@ -215,7 +217,7 @@ app.get('/naZamowienie', (req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 });
 
 app.get('/logOut', function (req, resp) {
@@ -235,44 +237,39 @@ app.get('/login.html', (req, resp) => {
 /*  */
 
 app.post('/potrawy', (req, resp) => {
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
+	if (req.session.email) {
+
+		var zmienna =
+		{
+			nazwa: req.body.nazwa,
+			cena: req.body.cena,
+			info: req.body.info,
+			kategoria: req.body.kategoria,
+			status: req.body.status
+		};
+
+		fetch('http://localhost:8080/potrawyApi', {
+			method: 'POST',
+			body: JSON.stringify(zmienna),
+			headers: { 'Content-Type': 'application/json' }
+		})
+		.then(res => res.json())
+		.then(json => console.log(json))
+		.catch(error => {
+			console.log(error);
+		});
 
 		if (req.session.email) {
-
-			var dbo = db.db("mydb");
-			var zmienna =
-			{
-				nazwa: req.body.nazwa,
-				cena: req.body.cena,
-				info: req.body.info,
-				kategoria: req.body.kategoria,
-				status: req.body.status
-			};
-
-			app.result.push(zmienna);
-
-			dbo.collection("potrawy").insertOne(zmienna, function (err, res) {
-				if (err) throw err;
-				console.log("Dodano nowa potrawe!");
-
-				if (req.session.email) {
-					resp.render('index.ejs', { potrawy: app.result, logged: true });
-				}
-				else resp.render('index.ejs', { potrawy: app.result, logged: false });
-
-				resp.end();
-				db.close();
-			});
-
-		} else {
-			resp.sendFile(path.join(__dirname + '/views/login.html'));
+			resp.render('index.ejs', { potrawy: app.result, logged: true });
 		}
+		else resp.render('index.ejs', { potrawy: app.result, logged: false });
 
-
-
-	});
+		resp.end();
+	} else {
+		resp.sendFile(path.join(__dirname + '/views/login.html'));
+	}
 });
+
 
 
 app.post('/loginTo', (req, resp) => {
@@ -305,9 +302,9 @@ app.post('/loginTo', (req, resp) => {
 
 
 app.route('/show/:id').get((req, resp) => {
-		var id1 = req.params.id;
+	var id1 = req.params.id;
 
-		axios.get('http://localhost:8080/potrawaApi/'+id1)
+	axios.get('http://localhost:8080/potrawaApi/' + id1)
 		.then(response => {
 			app.result = response.data;
 			console.log("Response received!");
@@ -319,7 +316,7 @@ app.route('/show/:id').get((req, resp) => {
 		})
 		.catch(error => {
 			console.log(error);
-		});	
+		});
 
 });
 
@@ -348,22 +345,22 @@ app.get('/delete/:id', (req, resp) => {
 
 app.route('/edit/:id')
 	.get((req, resp) => {
-				console.log("Edytujemy potrawe!");
-				var id1 = req.params.id;
-				axios.get('http://localhost:8080/potrawaApi/'+id1)
-				.then(response => {
-					app.result = response.data;
-					console.log("Response received!");
-		
-					if (req.session.email) {
-						resp.render('edit.ejs', { potrawy: app.result });
-					} else {
-						resp.sendFile(path.join(__dirname + '/views/login.html'));
-					}
-				})
-				.catch(error => {
-					console.log(error);
-				});			
+		console.log("Edytujemy potrawe!");
+		var id1 = req.params.id;
+		axios.get('http://localhost:8080/potrawaApi/' + id1)
+			.then(response => {
+				app.result = response.data;
+				console.log("Response received!");
+
+				if (req.session.email) {
+					resp.render('edit.ejs', { potrawy: app.result });
+				} else {
+					resp.sendFile(path.join(__dirname + '/views/login.html'));
+				}
+			})
+			.catch(error => {
+				console.log(error);
+			});
 	})
 
 	.post((req, res) => {
