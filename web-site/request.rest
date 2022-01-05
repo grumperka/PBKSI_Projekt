@@ -1,0 +1,7 @@
+POST http://localhost:8080/loginToApi
+Content-Type: : "application/json"
+
+{
+    "email": "admin@mail.com",
+    "pswd": "password"
+}

@@ -5,6 +5,9 @@ const axios = require('axios');
 const fetch = require('node-fetch');
 var fs = require('fs');
 var path = require('path');
+var jwt = require('jsonwebtoken');
+
+
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
 app.set('view engine', 'ejs')
@@ -12,7 +15,11 @@ app.result = [];
 const routes = require("./routesApi.js");
 routes(app);
 
+const routesAuth = require("./routesAuthApi.js");
+routesAuth(app);
+
 var MongoClient = require('mongodb').MongoClient;
+const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
 
 
@@ -30,7 +37,7 @@ app.get('/', (req, resp) => {
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("Popatrz");
 
 			if (req.session.email) {
 				resp.render('index.ejs', { potrawy: app.result, logged: true });
@@ -208,7 +215,6 @@ app.get('/naZamowienie', (req, resp) => {
 	axios.get('http://localhost:8080/allStatusApi/Na%20zamowienie')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
@@ -272,30 +278,40 @@ app.post('/potrawy', (req, resp) => {
 
 
 
-app.post('/loginTo', (req, resp) => {  /*  */
-	MongoClient.connect(url, function (err, db) {
-		if (err) throw err;
+app.post('/loginTo', (req, res) => {  /*  */
 
-		var dbo = db.db("mydb");
-		dbo.collection("users").findOne({ email: req.body.email, pswd: req.body.pswd }, function (err, result) {
-			if (err) throw err;
-			if (result) {
+	const zmienna = {
+		email: req.body.email,
+		pswd: req.body.pswd
+	};
 
-				req.session.email = req.body.email;
-				req.session.pswd = req.body.pswd;
+	console.log('SERVER');
+	console.log(zmienna);
 
-				app.result = result;
+	fetch('http://localhost:8080/loginToApi', {
+		method: 'POST',
+		body: JSON.stringify(zmienna),
+		headers: { 'Content-Type': 'application/json' }
+	})
+		.then(res => res.json())
+		.then(response => {
+			console.log('RESP DATA: ' + response.data);
 
-				resp.render('indexLogin.ejs', { users: app.result, logged: true });
-				resp.end('done');
+			if(response.data != "ERROR"){
+				req.session.email = response.data.email;
 
-			} else if (!result) {
-				resp.sendFile(path.join(__dirname + '/views/login.html'));
+				app.result = response.data;
+				res.render('indexLogin.ejs', { users: app.result, logged: true });
+				res.end('done');
 			}
-			db.close();
-		});
+			else {
+				res.sendFile(path.join(__dirname + '/views/login.html'));
+			}
 
-	});
+		})
+		.catch(error => {
+			console.log(error);
+		});
 
 });
 
@@ -358,7 +374,7 @@ app.route('/edit/:id')
 			});
 	})
 
-	.post((req, res) => { 
+	.post((req, res) => {
 		if (req.session.email) {
 			var zmienna =
 			{

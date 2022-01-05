@@ -5,7 +5,6 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://mongo:27017/mydb";
 
 
-
 module.exports = function (app) {
     app.use(bodyParser.json());
     app.use(express.json());
@@ -17,8 +16,8 @@ module.exports = function (app) {
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").find({}, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-                if (err) throw err;
-
+                if (err) return res.send(err);
+                
                 res.json(result);
                 db.close();
             });
@@ -31,7 +30,7 @@ module.exports = function (app) {
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").find({ kategoria: req.params.category }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-                if (err) throw err;
+                if (err) return res.send(err);
 
                 res.json(result);
                 db.close();
@@ -45,7 +44,7 @@ module.exports = function (app) {
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").find({ status: req.params.status }, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
-                if (err) throw err;
+                if (err) return res.send(err);
 
                 res.json(result);
                 db.close();
@@ -65,7 +64,7 @@ module.exports = function (app) {
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").find(ObjectId(id1)).toArray(function (err, result) {
-                if (err) throw err;
+                if (err) return res.send(err);
 
                 res.json(result);
                 db.close();
@@ -92,7 +91,8 @@ module.exports = function (app) {
 
             var dbo = db.db("mydb");
             dbo.collection("potrawy").insertOne(zmienna, function (err, res) {
-                if (err) throw err;
+                if (err) return res.send(err);
+
                 console.log("Dodano nowa potrawe!");
 
                 resp.json("OK");
@@ -112,7 +112,7 @@ module.exports = function (app) {
             var id1 = { _id: ObjectId(req.params.id) };
 
             dbo.collection("potrawy").deleteOne(id1, function (err, res) {
-                if (err) throw err;
+                if (err) return res.send(err);
 
                 console.log("Usunieto potrawe!");
 
@@ -154,9 +154,13 @@ module.exports = function (app) {
 					status: zmienna.status
 				}
 			}, (err, result) => {
-				if (err) return res.send(err);
+				if (err) return resp.send(err);
 
 			});
+
+            resp.json("OK");
+            resp.end();
+            db.close();
 
         });
     });;
