@@ -1,86 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Edycja potrawy</title>
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-  
-    <style> 
-#menu {
-	margin-bottom:0;
-	animation: animation 6s infinite;
-}
 
-@keyframes animation {
-  0%    {background-color:dimgray;}
-  16%   {background-color:gray;}
-  32%   {background-color:darkgray;}
-  48%   {background-color:silver;}
-  64%   {background-color:darkgray;}
-  80%   {background-color:gray;}
-  100%  {background-color:dimgray;}
-}
-</style>
-  
-  
+  <style>
+    #menu {
+      margin-bottom: 0;
+      animation: animation 6s infinite;
+    }
+
+    @keyframes animation {
+      0% {
+        background-color: dimgray;
+      }
+
+      16% {
+        background-color: gray;
+      }
+
+      32% {
+        background-color: darkgray;
+      }
+
+      48% {
+        background-color: silver;
+      }
+
+      64% {
+        background-color: darkgray;
+      }
+
+      80% {
+        background-color: gray;
+      }
+
+      100% {
+        background-color: dimgray;
+      }
+    }
+  </style>
+
+
 </head>
+
 <body>
-<div class="jumbotron text-center" id="menu">
-<h2 class="display-3">Edytuj</h2>
-</div>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" href="/">Cala karta dan</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/przystawki">Przystawki</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/zupy">Zupy</a>
-      </li>
-       <li class="nav-item">
-        <a class="nav-link" href="/salaty">Salaty</a>
-      </li>
-	  <li class="nav-item">
-        <a class="nav-link" href="/makarony">Makarony</a>
-      </li>
-	  <li class="nav-item">
-        <a class="nav-link" href="/miesa">Miesa</a>
-      </li>
-	  <li class="nav-item">
-        <a class="nav-link" href="/owoceMorza">Ryby i owoce morza</a>
-      </li>
-	  <li class="nav-item">
-        <a class="nav-link" href="/desery">Desery</a>
-      </li>
-	  <li class="nav-item">
-        <a class="nav-link" href="/dlaDzieci">Dla dzieci</a>
-      </li>
-
-    </ul>
-	 
+  <div class="jumbotron text-center" id="menu">
+    <h2 class="display-3">Edytuj</h2>
   </div>
-  <ul class="navbar-nav">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Cala karta dan</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/przystawki">Przystawki</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/zupy">Zupy</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/salaty">Salaty</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/makarony">Makarony</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/miesa">Miesa</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/owoceMorza">Ryby i owoce morza</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/desery">Desery</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/dlaDzieci">Dla dzieci</a>
+        </li>
+
+      </ul>
+
+    </div>
+    <ul class="navbar-nav">
 
 
-  <li class="nav-item">
-      <a class="nav-link" href="/logOut">Wyloguj sie</a>
-    </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logOut">Wyloguj sie</a>
+      </li>
 
-	  
-  <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
           Statusy dan
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -89,59 +113,72 @@
           <a class="dropdown-item" href="/naZamowienie">Na zamowienie</a>
         </div>
       </li>
-  </ul>
-  
-</nav>
+    </ul>
 
-<br />
+  </nav>
 
-<div class="container">
-  <% potrawy.forEach(function(wynik) { %>
-    <form action="/edit/<%= wynik._id %>" method="POST">
-	
-	<div class="form-group">
-	<p>Nazwa: <p>  
-      <input type="text" value="<%= wynik.nazwa %>" name="nazwa" class="form-control"> </div>
-	  <div class="form-group">
-	  <p>Cena: <p>  
-      <input type="text" value="<%= wynik.cena %>" name="cena" class="form-control"> </div>
-	  <div class="form-group">
-	  <p>Opis: <p>  
-	  <textarea rows="4" cols="75" placeholder="Podaj opis:" name="info" class="form-control"><%= wynik.info %></textarea></div>
-	  
-	<div class="form-group">
-<p>Kategorie: <p>  
-	  <select id="kategoria" name="kategoria" class="custom-select">
-    <option value="Przystawki">Przystawki</option>
-    <option value="Zupy">Zupy</option>
-    <option value="Salaty">Salaty</option>
-    <option value="Makarony">Makarony</option>
-	<option value="Miesa">Miesa</option>
-	<option value="Ryby i owoce morza">Ryby i owoce morza</option>
-	<option value="Desery">Desery</option>
-	<option value="Dla dzieci">Dla dzieci</option>
-  </select>
-</div>
+  <br />
 
-	 <div class="form-group">
-	<p>Status: <p>
-	<div class="form-check"><label class="form-check-label"><input type="radio" name="status" value="Dostepne" class="form-check-input" checked> Dostepne</label></div>
-	<div class="form-check"><label class="form-check-label"><input type="radio" name="status" value="Na zamowienie" class="form-check-input"> Na zamowienie</label></div>
-	<div class="form-check"><label class="form-check-label"><input type="radio" name="status" value="Niedostepne" class="form-check-input"> Niedostepne</label></div>
-	</div>
-	  <br />
-      <button class="btn btn-light"><a href="/">Powrot do listy</a></button>
-	  
-      <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
-    </form>
-  <% }) %>
+  <div class="container">
+    <% potrawy.forEach(function(wynik) { %>
+      <form action="/edit/<%= wynik._id %>" method="POST">
+
+        <div class="form-group">
+          <p>Nazwa:
+          <p>
+            <input type="text" value="<%= wynik.nazwa %>" name="nazwa" class="form-control">
+        </div>
+        <div class="form-group">
+          <p>Cena:
+          <p>
+            <input type="text" value="<%= wynik.cena %>" name="cena" class="form-control">
+        </div>
+        <div class="form-group">
+          <p>Opis:
+          <p>
+            <textarea rows="4" cols="75" placeholder="Podaj opis:" name="info"
+              class="form-control"><%= wynik.info %></textarea>
+        </div>
+
+        <div class="form-group">
+          <p>Kategorie:
+          <p>
+            <select id="kategoria" name="kategoria" class="custom-select">
+              <option value="Przystawki">Przystawki</option>
+              <option value="Zupy">Zupy</option>
+              <option value="Salaty">Salaty</option>
+              <option value="Makarony">Makarony</option>
+              <option value="Miesa">Miesa</option>
+              <option value="Ryby i owoce morza">Ryby i owoce morza</option>
+              <option value="Desery">Desery</option>
+              <option value="Dla dzieci">Dla dzieci</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+          <p>Status:
+          <p>
+          <div class="form-check"><label class="form-check-label"><input type="radio" name="status" value="Dostepne"
+                class="form-check-input" checked> Dostepne</label></div>
+          <div class="form-check"><label class="form-check-label"><input type="radio" name="status"
+                value="Na zamowienie" class="form-check-input"> Na zamowienie</label></div>
+          <div class="form-check"><label class="form-check-label"><input type="radio" name="status" value="Niedostepne"
+                class="form-check-input"> Niedostepne</label></div>
+        </div>
+        <br />
+        <button class="btn btn-light"><a href="/">Powrot do listy</a></button>
+
+        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+      </form>
+      <% }) %>
   </div>
-  
-<br>
-<footer class="footer bg-dark" style="position: fixed;left: 0; bottom: 0; width: 100%; text-align: center;">
-      <div class="container">
-        <span class="text-muted"><b>Siwiak Projekt PBKSI 2021</b></span>
-      </div>
-    </footer>
+
+  <br>
+  <footer class="footer bg-dark" style="position: fixed;left: 0; bottom: 0; width: 100%; text-align: center;">
+    <div class="container">
+      <span class="text-muted"><b>Siwiak Projekt PBKSI 2021</b></span>
+    </div>
+  </footer>
 </body>
+
 </html>

@@ -18,7 +18,7 @@
         pass = $("#password").val();
 
 
-        $.post("/loginTo", { email: email, pswd: pass }, function (data) {
+        $.post("/registerTo", { email: email, pswd: pass }, function (data) {
           if (data === 'done') {
             window.location.href = "/indexLogin";
           }
@@ -141,8 +141,8 @@
   <br />
 
   <div class="container">
-    <h2>Logowanie</h2>
-    <form action="/loginTo" method="POST">
+    <h2>Rejestracja</h2>
+    <form action="/registerTo" method="POST">
       <div class="form-group">
         <label for="email">Email:</label>
         <input type="email" class="form-control" id="email" placeholder="Podaj email" name="email">
@@ -151,12 +151,7 @@
         <label for="pwd">Haslo:</label>
         <input type="password" class="form-control" id="pswd" placeholder="Podaj haslo" name="pswd">
       </div>
-      <div class="form-group form-check">
-        <label class="form-check-label">
-          <input class="form-check-input" type="checkbox" name="remember"> Zapamietaj mnie
-        </label>
-      </div>
-      <button type="submit" class="btn btn-primary" id="submit">Zaloguj sie</button>
+      <button type="submit" class="btn btn-danger" id="submit">Zarejestruj sie</button>
     </form>
   </div>
 

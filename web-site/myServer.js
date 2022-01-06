@@ -241,6 +241,10 @@ app.get('/login.html', (req, resp) => {  /*  */
 	resp.sendFile(path.join(__dirname + '/views/login.html'));
 });
 
+app.get('/register.html', (req, resp) => {  /*  */
+	resp.sendFile(path.join(__dirname + '/views/register.html'));
+});
+
 
 app.post('/potrawy', (req, resp) => {
 	if (req.session.email) {
@@ -278,7 +282,7 @@ app.post('/potrawy', (req, resp) => {
 
 
 
-app.post('/loginTo', (req, res) => {  /*  */
+app.post('/loginTo', (req, res) => { 
 
 	const zmienna = {
 		email: req.body.email,
@@ -314,6 +318,45 @@ app.post('/loginTo', (req, res) => {  /*  */
 		});
 
 });
+
+
+app.post('/registerTo', (req, res) => {  /* */
+
+	const zmienna = {
+		email: req.body.email,
+		pswd: req.body.pswd
+	};
+
+	console.log('SERVER');
+	console.log(zmienna);
+
+	fetch('http://localhost:8080/registerToApi', {
+		method: 'POST',
+		body: JSON.stringify(zmienna),
+		headers: { 'Content-Type': 'application/json' }
+	})
+		.then(res => res.json())
+		.then(response => {
+			console.log('RESP DATA: ' + response.data);
+
+			if(response.data != "ERROR"){
+				req.session.email = response.data.email;
+
+				app.result = response.data;
+				res.render('indexLogin.ejs', { users: app.result, logged: true });
+				res.end('done');
+			}
+			else {
+				res.sendFile(path.join(__dirname + '/views/login.html'));
+			}
+
+		})
+		.catch(error => {
+			console.log(error);
+		});
+
+});
+
 
 
 app.route('/show/:id').get((req, resp) => {
