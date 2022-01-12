@@ -18,6 +18,9 @@ routes(app);
 const routesAuth = require("./routesAuthApi.js");
 routesAuth(app);
 
+const routesJWT = require("./routesJWTApi.js");
+routesJWT(app);
+
 var MongoClient = require('mongodb').MongoClient;
 const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
@@ -237,11 +240,11 @@ app.get('/logOut', function (req, resp) {  /*  */
 });
 
 
-app.get('/login.html', (req, resp) => {  /*  */
+app.get('/login.html', (req, resp) => {  
 	resp.sendFile(path.join(__dirname + '/views/login.html'));
 });
 
-app.get('/register.html', (req, resp) => {  /*  */
+app.get('/register.html', (req, resp) => {  
 	resp.sendFile(path.join(__dirname + '/views/register.html'));
 });
 
@@ -305,6 +308,20 @@ app.post('/loginTo', (req, res) => {
 				req.session.email = response.data.email;
 
 				app.result = response.data;
+
+				fetch('http://localhost:8080/generateAccessTokenApi', {
+					method: 'POST',
+					body: JSON.stringify(response.data),
+					headers: { 'Content-Type': 'application/json' }
+				})
+					.then(res => res.json())
+					.then(response => {
+						console.log('ODP TOKEN: ' + response.accessToken);
+					}).catch(error => {
+						console.log(error);
+					});
+
+				////
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');
 			}
@@ -320,7 +337,7 @@ app.post('/loginTo', (req, res) => {
 });
 
 
-app.post('/registerTo', (req, res) => {  /* */
+app.post('/registerTo', (req, res) => {  
 
 	const zmienna = {
 		email: req.body.email,
