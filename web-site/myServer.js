@@ -3,9 +3,10 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const fetch = require('node-fetch');
-var fs = require('fs');
-var path = require('path');
-var jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -21,6 +22,8 @@ routesAuth(app);
 const routesJWT = require("./routesJWTApi.js");
 routesJWT(app);
 
+let accessTokenList = [];
+
 var MongoClient = require('mongodb').MongoClient;
 const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
@@ -29,6 +32,7 @@ var url = "mongodb://mongo:27017/mydb";
 app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: false }));
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
@@ -43,6 +47,62 @@ app.get('/', (req, resp) => {
 			console.log("Popatrz");
 
 			if (req.session.email) {
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				const authHeader = req.headers['authorization'];
+				const token = authHeader && authHeader.split(' ')[1];
+                if (token == null) {console.log("WESZLO PRZEZ ERROR")}
+
+				console.log("ACC TOK : "+authHeader);
+
+				console.log('/loginToApi');
+
+				fetch('http://localhost:8080/findUserApi', {
+					method: 'POST',
+					body: JSON.stringify(zmienna),
+					headers: { 'Content-Type': 'application/json' }
+				})
+					.then(resp =>
+						resp.json()
+					)
+					.then(resp => {
+						console.log('ODP: ' + JSON.stringify(resp.odp[0]));
+						const user = resp.odp[0];
+						//const password = req.body.pswd;
+						console.log('ODD email: ' + resp.odp[0]._id);
+						//console.log('REQ SESSION: ' + accesT);
+
+						var user01 = {
+							id: resp.odp[0]._id,
+							mail: resp.odp[0].email,
+							pswd: resp.odp[0].pswd
+						};
+
+						//////////////////////
+						fetch('http://localhost:8080/getAccessTokenApi', {
+							method: 'POST',
+							body: JSON.stringify(user01),
+							headers: {
+								'Content-Type': 'application/json'
+							}
+						})
+							.then(resp =>
+								resp.json()
+							).then(resp => {
+								console.log("ODPOWIEDZ NA ACCESS TOKEN");
+								console.log(resp.data);
+							})
+							.catch(error => {
+								console.log("ODPOWIEDZ NA ACCESS TOKEN ERR");
+								console.log(error);
+							});
+						/////////////////////
+
+					});
+
 				resp.render('index.ejs', { potrawy: app.result, logged: true });
 			}
 			else
@@ -240,11 +300,11 @@ app.get('/logOut', function (req, resp) {  /*  */
 });
 
 
-app.get('/login.html', (req, resp) => {  
+app.get('/login.html', (req, resp) => {
 	resp.sendFile(path.join(__dirname + '/views/login.html'));
 });
 
-app.get('/register.html', (req, resp) => {  
+app.get('/register.html', (req, resp) => {
 	resp.sendFile(path.join(__dirname + '/views/register.html'));
 });
 
@@ -285,7 +345,7 @@ app.post('/potrawy', (req, resp) => {
 
 
 
-app.post('/loginTo', (req, res) => { 
+app.post('/loginTo', (req, res) => {
 
 	const zmienna = {
 		email: req.body.email,
@@ -304,7 +364,7 @@ app.post('/loginTo', (req, res) => {
 		.then(response => {
 			console.log('RESP DATA: ' + response.data);
 
-			if(response.data != "ERROR"){
+			if (response.data != "ERROR") {
 				req.session.email = response.data.email;
 
 				app.result = response.data;
@@ -317,10 +377,14 @@ app.post('/loginTo', (req, res) => {
 					.then(res => res.json())
 					.then(response => {
 						console.log('ODP TOKEN: ' + response.accessToken);
+						accessTokenList.push(response.accessToken);
+						//req.session.accessToken = response.accessToken;
+						//console.log("ACC TOK REQ: "+req.session.accessToken);
 					}).catch(error => {
 						console.log(error);
 					});
 
+					//console.log("ACC TOK REQ 1: "+req.session.accessToken);
 				////
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');
@@ -337,7 +401,7 @@ app.post('/loginTo', (req, res) => {
 });
 
 
-app.post('/registerTo', (req, res) => {  
+app.post('/registerTo', (req, res) => {
 
 	const zmienna = {
 		email: req.body.email,
@@ -356,7 +420,7 @@ app.post('/registerTo', (req, res) => {
 		.then(response => {
 			console.log('RESP DATA: ' + response.data);
 
-			if(response.data != "ERROR"){
+			if (response.data != "ERROR") {
 				req.session.email = response.data.email;
 
 				app.result = response.data;
@@ -463,3 +527,4 @@ app.route('/edit/:id')
 			resp.sendFile(path.join(__dirname + '/views/login.html'));
 		}
 	});
+

@@ -1,6 +1,7 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 var jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 
 var MongoClient = require('mongodb').MongoClient;
@@ -12,6 +13,7 @@ let refreshTokenList = [];
 module.exports = function (app) {
     app.use(bodyParser.json());
     app.use(express.json());
+    app.use(cookieParser());
     app.use(bodyParser.urlencoded({ extended: true }));
     require("dotenv").config();
 
@@ -21,6 +23,8 @@ module.exports = function (app) {
         var password = req.body.pswd;
         console.log('/generateAccessTokenApi');
 
+        console.log('RTL: ' + refreshTokenList.length);
+
         var user = {
             id: id,
             email: mail,
@@ -29,7 +33,7 @@ module.exports = function (app) {
 
         console.log('USER: ' + user.id);
 
-        const accessToken = generateAccessToken(user,'15s');
+        const accessToken = generateAccessToken(user, '60s');
         const refreshToken = generateRefreshToken(user);
         refreshTokenList.push(refreshToken);
 
@@ -37,58 +41,55 @@ module.exports = function (app) {
         resp.end();
     });
 
-    app.post("/getAccessTokenApi", (req, resp) => {
+    app.post("/getAccessTokenApi", async (req, resp) => {
         const authHeader = req.headers['authorization'];
-        
+
         console.log("getAccessTokenApi");
-        console.log("H: " + authHeader);
+        //console.log("H: " + req.body._id);
 
-        var id = req.body._id;
-        var mail = req.body.email;
-        var password = req.body.pswd;
+        //var accessToken = req.body.accessToken;
 
-        const user = {
-            id: id,
-            email: mail,
-            pswd: password
+        // const user = {
+        //     id: req.body._id,
+        //     email: req.body.mail,
+        //     pswd: req.body.pswd
+        // }
+
+        //console.log("USER: " + user.id);
+        const token = authHeader && authHeader.split(' ')[2];
+        if (token == null) { console.log("WESZLO PRZEZ ERROR"); return resp.json('ERROR'); }
+
+        console.log("TOK: " + token);
+
+        var id0;
+        var email0;
+        var pswd0;
+
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                resp.json({data: "ERROR" });
+                resp.end();
+            };
+            id0 = user.id;
+            email0 = user.email;
+            pswd0 = user.pswd;
+        });
+
+        let zmienna = {
+            id: id0,
+            email: email0,
+            pswd: pswd0
         }
-
-        console.log("H_Mail: " + user.mail);
-
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token == null) return resp.json('ERROR');
-
-        let response = verifyAccessToken(token);
-        if(response != "ERROR") 
-        {
-            console.log("ERR AC");
-            resp.json({ data: "ERROR"});
-        }
-        else {
-            resp.json({ data: user });
-            console.log("ACC AC");
-        }
-
+        resp.json({ data: zmienna });
         resp.end();
     });
 
-
-
 }
 
-function generateAccessToken(user,time){
+function generateAccessToken(user, time) {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: time });
 }
 
-function generateRefreshToken(user){
+function generateRefreshToken(user) {
     return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
-}
-
-function verifyAccessToken(token) {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      console.log(err)
-      if (err) return "ERROR";
-
-      return user;
-    });
 }
