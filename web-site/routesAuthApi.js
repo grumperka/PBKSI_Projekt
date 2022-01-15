@@ -190,18 +190,11 @@ module.exports = function (app) {
 }
 
 function compareHASH(hash, text) {
-    console.log('METHOD I');
-
     let results = bcrypt.compareSync(text, hash);
-    console.log('Czy to samo? ' + results);
-
     return results;
 }
 
 function makeHASH(text) {
-    console.log('METHOD II');
-
     let results = bcrypt.hashSync(text, 10);
-
     return results;
 }

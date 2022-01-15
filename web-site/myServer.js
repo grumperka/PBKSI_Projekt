@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -29,10 +29,10 @@ const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
 
 
-app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: false }));
+app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: true }));
 app.use(bodyParser.json());
 app.use(express.json());
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
@@ -41,6 +41,11 @@ app.listen(8080, function () {
 });
 
 app.get('/', (req, resp) => {
+
+	
+	const accessToken = req.session.accessToken;
+	console.log("ACC TOK REQ 1: "+ accessToken);
+
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
 			app.result = response.data;
@@ -52,11 +57,11 @@ app.get('/', (req, resp) => {
 					email: req.session.email
 				};
 
-				const authHeader = req.headers['authorization'];
-				const token = authHeader && authHeader.split(' ')[1];
-                if (token == null) {console.log("WESZLO PRZEZ ERROR")}
+				//const authHeader = req.headers['authorization'];
+				//const token = authHeader && authHeader.split(' ')[1];
+               // if (token == null) {console.log("WESZLO PRZEZ ERROR")}
 
-				console.log("ACC TOK : "+authHeader);
+				//console.log("ACC TOK : "+authHeader);
 
 				console.log('/loginToApi');
 
@@ -81,12 +86,16 @@ app.get('/', (req, resp) => {
 							pswd: resp.odp[0].pswd
 						};
 
+						const bearer = 'Bearer ' + accessToken.toString();
+
 						//////////////////////
 						fetch('http://localhost:8080/getAccessTokenApi', {
 							method: 'POST',
+							mode: 'no-cors',
 							body: JSON.stringify(user01),
 							headers: {
-								'Content-Type': 'application/json'
+								'Content-Type': 'application/json',
+								 Authorization : bearer
 							}
 						})
 							.then(resp =>
@@ -354,6 +363,7 @@ app.post('/loginTo', (req, res) => {
 
 	console.log('SERVER');
 	console.log(zmienna);
+	
 
 	fetch('http://localhost:8080/loginToApi', {
 		method: 'POST',
@@ -378,13 +388,16 @@ app.post('/loginTo', (req, res) => {
 					.then(response => {
 						console.log('ODP TOKEN: ' + response.accessToken);
 						accessTokenList.push(response.accessToken);
-						//req.session.accessToken = response.accessToken;
-						//console.log("ACC TOK REQ: "+req.session.accessToken);
+						let ac = response.accessToken;
+						req.session.accessToken = ac;
+						console.log("ACC TOK REQ: "+req.session.accessToken);
+						req.session.save();
 					}).catch(error => {
 						console.log(error);
 					});
 
-					//console.log("ACC TOK REQ 1: "+req.session.accessToken);
+					//req.session.accessToken = ac;
+					console.log("ACC TOK REQ 0: "+req.session.accessToken);
 				////
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');

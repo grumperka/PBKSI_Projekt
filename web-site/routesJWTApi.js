@@ -33,7 +33,7 @@ module.exports = function (app) {
 
         console.log('USER: ' + user.id);
 
-        const accessToken = generateAccessToken(user, '60s');
+        const accessToken = generateAccessToken(user, '30s');
         const refreshToken = generateRefreshToken(user);
         refreshTokenList.push(refreshToken);
 
@@ -42,9 +42,11 @@ module.exports = function (app) {
     });
 
     app.post("/getAccessTokenApi", async (req, resp) => {
+        console.log(req);
         const authHeader = req.headers['authorization'];
 
         console.log("getAccessTokenApi");
+        console.log("Auth: " + authHeader);
         //console.log("H: " + req.body._id);
 
         //var accessToken = req.body.accessToken;
@@ -56,10 +58,11 @@ module.exports = function (app) {
         // }
 
         //console.log("USER: " + user.id);
-        const token = authHeader && authHeader.split(' ')[2];
+        const token = authHeader && authHeader.split(' ')[1];
+        console.log("TOK before: " + token);
         if (token == null) { console.log("WESZLO PRZEZ ERROR"); return resp.json('ERROR'); }
 
-        console.log("TOK: " + token);
+        console.log("TOK after: " + token);
 
         var id0;
         var email0;
@@ -67,21 +70,25 @@ module.exports = function (app) {
 
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
             if (err) {
-                resp.json({data: "ERROR" });
+                resp.json({ data: "ERROR" });
                 resp.end();
-            };
-            id0 = user.id;
-            email0 = user.email;
-            pswd0 = user.pswd;
+            } else {
+                id0 = user.id;
+                email0 = user.email;
+                pswd0 = user.pswd;
+
+                let zmienna = {
+                    id: id0,
+                    email: email0,
+                    pswd: pswd0
+                }
+                resp.json({ data: zmienna });
+                resp.end();
+            }
+
         });
 
-        let zmienna = {
-            id: id0,
-            email: email0,
-            pswd: pswd0
-        }
-        resp.json({ data: zmienna });
-        resp.end();
+
     });
 
 }

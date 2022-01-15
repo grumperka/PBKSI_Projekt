@@ -1,3 +1,3 @@
 POST http://localhost:8080/getAccessTokenApi
 Content-Type: : "application/json"
-Authorization: : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxZTAwZDAyNzljZjU5ZGZmNDFmMjE2OSIsImVtYWlsIjoiYWRtaW5AbWFpbC5jb20iLCJwc3dkIjoiJDJiJDEwJGY2Nm83R25vc0E4czEucnJhcEZEanVUUi9zcDFUUWxjWnRtWmxzS0FuenNmSktPVHByUWplIiwiaWF0IjoxNjQyMDk0OTkxLCJleHAiOjE2NDIwOTUwNTF9.9aZLynYmbzz3SSnP2_9VwiXfofMo8bC09Zca7sm8VrM
+Authorization: : Bearer 
