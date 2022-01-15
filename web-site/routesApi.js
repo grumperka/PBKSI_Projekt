@@ -17,7 +17,7 @@ module.exports = function (app) {
             var dbo = db.db("mydb");
             dbo.collection("potrawy").find({}, { nazwa: 1, cena: 1, status: 1 }).toArray(function (err, result) {
                 if (err) return res.send(err);
-                
+
                 res.json(result);
                 db.close();
             });
@@ -144,19 +144,19 @@ module.exports = function (app) {
             var dbo = db.db("mydb");
 
             dbo.collection("potrawy").updateMany({
-				_id: ObjectId(zmienna.id)
-			}, {
-				$set: {
-					nazwa: zmienna.nazwa,
-					cena: zmienna.cena,
-					info: zmienna.info,
-					kategoria: zmienna.kategoria,
-					status: zmienna.status
-				}
-			}, (err, result) => {
-				if (err) return resp.send(err);
+                _id: ObjectId(zmienna.id)
+            }, {
+                $set: {
+                    nazwa: zmienna.nazwa,
+                    cena: zmienna.cena,
+                    info: zmienna.info,
+                    kategoria: zmienna.kategoria,
+                    status: zmienna.status
+                }
+            }, (err, result) => {
+                if (err) return resp.send(err);
 
-			});
+            });
 
             resp.json("OK");
             resp.end();

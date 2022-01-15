@@ -6,7 +6,6 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
-//const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -32,7 +31,6 @@ var url = "mongodb://mongo:27017/mydb";
 app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: true }));
 app.use(bodyParser.json());
 app.use(express.json());
-//app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
@@ -41,10 +39,8 @@ app.listen(8080, function () {
 });
 
 app.get('/', (req, resp) => {
-
-	
 	const accessToken = req.session.accessToken;
-	console.log("ACC TOK REQ 1: "+ accessToken);
+	console.log("ACC TOK REQ 1: " + accessToken);
 
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
@@ -57,14 +53,6 @@ app.get('/', (req, resp) => {
 					email: req.session.email
 				};
 
-				//const authHeader = req.headers['authorization'];
-				//const token = authHeader && authHeader.split(' ')[1];
-               // if (token == null) {console.log("WESZLO PRZEZ ERROR")}
-
-				//console.log("ACC TOK : "+authHeader);
-
-				console.log('/loginToApi');
-
 				fetch('http://localhost:8080/findUserApi', {
 					method: 'POST',
 					body: JSON.stringify(zmienna),
@@ -74,17 +62,15 @@ app.get('/', (req, resp) => {
 						resp.json()
 					)
 					.then(resp => {
-						console.log('ODP: ' + JSON.stringify(resp.odp[0]));
 						const user = resp.odp[0];
-						//const password = req.body.pswd;
-						console.log('ODD email: ' + resp.odp[0]._id);
-						//console.log('REQ SESSION: ' + accesT);
 
 						var user01 = {
 							id: resp.odp[0]._id,
 							mail: resp.odp[0].email,
-							pswd: resp.odp[0].pswd
+							pswd: resp.odp[0].pswd,
 						};
+
+						var refreshToken = resp.odp[0].refreshToken;
 
 						const bearer = 'Bearer ' + accessToken.toString();
 
@@ -95,7 +81,7 @@ app.get('/', (req, resp) => {
 							body: JSON.stringify(user01),
 							headers: {
 								'Content-Type': 'application/json',
-								 Authorization : bearer
+								Authorization: bearer
 							}
 						})
 							.then(resp =>
@@ -103,6 +89,32 @@ app.get('/', (req, resp) => {
 							).then(resp => {
 								console.log("ODPOWIEDZ NA ACCESS TOKEN");
 								console.log(resp.data);
+								console.log("Widac USER?: "+user01);
+
+								const bearer = 'Bearer ' + refreshToken.toString();
+								console.log("B: "+bearer);
+
+								if (resp.data === "ERROR") {
+									fetch('http://localhost:8080/refreshAccessTokenApi', {
+										method: 'POST',
+										body: JSON.stringify(user01),
+										headers: { 
+											'Content-Type': 'application/json',
+											Authorization: bearer
+										 }
+									})
+										.then(res => res.json())
+										.then(response => {
+											console.log('ODP TOKEN: ' + response.accessToken);
+
+											let ac = response.accessToken;
+											req.session.accessToken = ac;
+											req.session.save();
+										}).catch(error => {
+											console.log(error);
+										});
+								}
+
 							})
 							.catch(error => {
 								console.log("ODPOWIEDZ NA ACCESS TOKEN ERR");
@@ -126,7 +138,7 @@ app.get('/przystawki', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Przystawki')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/przystawki");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -142,7 +154,7 @@ app.get('/zupy', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Zupy')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/zupy");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -158,7 +170,7 @@ app.get('/salaty', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Salaty')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/salaty");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -174,7 +186,7 @@ app.get('/makarony', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Makarony')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/makarony");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -190,7 +202,7 @@ app.get('/miesa', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Miesa')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/miesa");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -206,7 +218,7 @@ app.get('/owoceMorza', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Ryby%20i%20owoce%20morza')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/owoceMorza");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -223,7 +235,7 @@ app.get('/desery', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Desery')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/desery");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -239,7 +251,7 @@ app.get('/dlaDzieci', (req, resp) => {
 	axios.get('http://localhost:8080/allCategoryApi/Dla%20dzieci')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/dlaDzieci");
 
 			if (req.session.email) {
 				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
@@ -255,7 +267,7 @@ app.get('/dostepne', (req, resp) => {
 	axios.get('http://localhost:8080/allStatusApi/Dostepne')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/dostepne");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
@@ -271,7 +283,7 @@ app.get('/niedostepne', (req, resp) => {
 	axios.get('http://localhost:8080/allStatusApi/Niedostepne')
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/niedostepne");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
@@ -287,6 +299,7 @@ app.get('/naZamowienie', (req, resp) => {
 	axios.get('http://localhost:8080/allStatusApi/Na%20zamowienie')
 		.then(response => {
 			app.result = response.data;
+			console.log("/naZamowienie");
 
 			if (req.session.email) {
 				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
@@ -298,7 +311,7 @@ app.get('/naZamowienie', (req, resp) => {
 		});
 });
 
-app.get('/logOut', function (req, resp) {  /*  */
+app.get('/logOut', function (req, resp) {
 	req.session.destroy(function (err) {
 		if (err) {
 			console.log(err);
@@ -361,10 +374,6 @@ app.post('/loginTo', (req, res) => {
 		pswd: req.body.pswd
 	};
 
-	console.log('SERVER');
-	console.log(zmienna);
-	
-
 	fetch('http://localhost:8080/loginToApi', {
 		method: 'POST',
 		body: JSON.stringify(zmienna),
@@ -387,17 +396,14 @@ app.post('/loginTo', (req, res) => {
 					.then(res => res.json())
 					.then(response => {
 						console.log('ODP TOKEN: ' + response.accessToken);
-						accessTokenList.push(response.accessToken);
+
 						let ac = response.accessToken;
 						req.session.accessToken = ac;
-						console.log("ACC TOK REQ: "+req.session.accessToken);
 						req.session.save();
 					}).catch(error => {
 						console.log(error);
 					});
 
-					//req.session.accessToken = ac;
-					console.log("ACC TOK REQ 0: "+req.session.accessToken);
 				////
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');
@@ -436,6 +442,55 @@ app.post('/registerTo', (req, res) => {
 			if (response.data != "ERROR") {
 				req.session.email = response.data.email;
 
+				/* TUTAJ ACCESS TOKEN */
+
+				//FIND_USER
+				//Generate_Token
+
+				const zmienna = {
+					email: req.session.email,
+					pswd: response.data.pswd
+				};
+
+				fetch('http://localhost:8080/findUserApi', {
+					method: 'POST',
+					body: JSON.stringify(zmienna),
+					headers: { 'Content-Type': 'application/json' }
+				})
+					.then(resp =>
+						resp.json()
+					)
+					.then(resp => {
+						const user = resp.odp[0];
+
+						var user01 = {
+							id: resp.odp[0]._id,
+							mail: resp.odp[0].email,
+							pswd: resp.odp[0].pswd
+						};
+
+						//////////////////////
+						fetch('http://localhost:8080/generateAccessTokenApi', {
+							method: 'POST',
+							body: JSON.stringify(user),
+							headers: { 'Content-Type': 'application/json' }
+						})
+							.then(res => res.json())
+							.then(response => {
+								console.log('ODP TOKEN: ' + response.accessToken);
+
+								let ac = response.accessToken;
+								req.session.accessToken = ac;
+								req.session.save();
+							}).catch(error => {
+								console.log(error);
+							});
+						/////////////////////
+
+					});
+
+
+				/* TUTAJ ACCESS TOKEN */
 				app.result = response.data;
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');
@@ -459,7 +514,7 @@ app.route('/show/:id').get((req, resp) => {
 	axios.get('http://localhost:8080/potrawaApi/' + id1)
 		.then(response => {
 			app.result = response.data;
-			console.log("Response received!");
+			console.log("/show");
 
 			if (req.session.email) {
 				resp.render('show.ejs', { potrawy: app.result, logged: true });
@@ -478,7 +533,7 @@ app.get('/delete/:id', (req, resp) => {
 
 		axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
 			.then(response => {
-				console.log(response.data);
+				console.log("/delete");
 
 				resp.redirect('/');
 			})
@@ -498,7 +553,7 @@ app.route('/edit/:id')
 		axios.get('http://localhost:8080/potrawaApi/' + id1)
 			.then(response => {
 				app.result = response.data;
-				console.log("Response received!");
+				console.log("/edit");
 
 				if (req.session.email) {
 					resp.render('edit.ejs', { potrawy: app.result });
@@ -540,4 +595,3 @@ app.route('/edit/:id')
 			resp.sendFile(path.join(__dirname + '/views/login.html'));
 		}
 	});
-

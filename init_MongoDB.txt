@@ -39,6 +39,6 @@ db.potrawy.insertMany([
 ])
 ///////////////////////////
 db.users.insertMany([
-		{	email: "admin@mail.com",	pswd: "$2b$10$f66o7GnosA8s1.rrapFDjuTR/sp1TQlcZtmZlsKAnzsfJKOTprQje"	},
-		{	email: "user@mail.com",		pswd: "$2b$10$Mfi8crN8crmpgeftZgF/N.5uw8XqItFkUWpAJUru6pmF8G.JIQjNu"	}
+		{	email: "admin@mail.com",	pswd: "$2b$10$f66o7GnosA8s1.rrapFDjuTR/sp1TQlcZtmZlsKAnzsfJKOTprQje", refreshToken: ""	},
+		{	email: "user@mail.com",		pswd: "$2b$10$Mfi8crN8crmpgeftZgF/N.5uw8XqItFkUWpAJUru6pmF8G.JIQjNu", refreshToken: ""	}
 ])

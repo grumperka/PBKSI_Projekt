@@ -21,7 +21,7 @@ module.exports = function (app) {
             if (err) throw err;
 
             var dbo = db.db("mydb");
-            dbo.collection("users").find({ email: mail }, { email: 1, pswd: 1 }).toArray(function (err, result) {
+            dbo.collection("users").find({ email: mail }, { email: 1, pswd: 1, refreshToken: 1 }).toArray(function (err, result) {
                 if (err) return resp.json({ data: "ERROR" });
 
                 if (!result.length) {
@@ -46,7 +46,8 @@ module.exports = function (app) {
 
         var zmienna = {
             email: mail,
-            pswd: password
+            pswd: password,
+            refreshToken: ""  
         };
 
         MongoClient.connect(url, function (err, db) {
