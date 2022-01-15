@@ -28,7 +28,7 @@ const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
 
 
-app.use(session({ secret: 'ssshhhhh', saveUninitialized: false, resave: true }));
+app.use(session({ secret: process.env.SESSION_SECRET, saveUninitialized: false, resave: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));

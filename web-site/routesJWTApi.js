@@ -8,8 +8,6 @@ const fetch = require('node-fetch');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://mongo:27017/mydb";
 
-
-
 module.exports = function (app) {
     app.use(bodyParser.json());
     app.use(express.json());
