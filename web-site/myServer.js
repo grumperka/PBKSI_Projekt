@@ -55,13 +55,13 @@ app.get('/', (req, resp) => {
 
 				console.log("Pass: " + pass);
 				if (pass === true) {
-					resp.render('index.ejs', { potrawy: app.result, logged: true });
+					resp.render('index.ejs', { potrawy: app.result, logged: true, alert: "" });
 				} else {
-					resp.render('index.ejs', { potrawy: app.result, logged: false });
+					resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
 				}
 			}
 			else
-				resp.render('index.ejs', { potrawy: app.result, logged: false });
+				resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
 		})
 		.catch(error => {
 			console.log(error);
@@ -410,16 +410,36 @@ app.get('/logOut', function (req, resp) {
 });
 
 
-app.get('/login.html', (req, resp) => {
-	resp.sendFile(path.join(__dirname + '/views/login.html'));
+app.get('/login', (req, resp) => {
+	resp.render('login', { alert: "" });
 });
 
-app.get('/register.html', (req, resp) => {
-	resp.sendFile(path.join(__dirname + '/views/register.html'));
+app.get('/register', (req, resp) => {
+	resp.render('register', { alert: "" });
 });
 
+function addPotrawaValidation(req, res, next) {
+	console.log("addPotrawaValidation");
 
-app.post('/potrawy', (req, resp) => {
+	var nazwa = req.body.nazwa;
+	var cena = req.body.cena;
+	var info =  req.body.info;
+	var kategoria =  req.body.kategoria;
+	var status =  req.body.status;
+
+	if (typeof nazwa === 'undefinded' || typeof cena === 'undefinded' || typeof info === 'undefinded' || typeof kategoria === 'undefinded' || typeof status === 'undefinded' ||
+	nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
+	nazwa.length < 5 && nazwa.length > 100 ) {
+		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Nieprawidlowe dane w formularzu."  });
+	}
+	else {
+		console.log(nazwa);
+		console.log("------------------------OK");
+		next()
+	}
+}
+
+app.post('/potrawy', addPotrawaValidation ,(req, resp) => {
 	if (req.session.email) {
 
 		const zmienna0 = {
@@ -459,17 +479,36 @@ app.post('/potrawy', (req, resp) => {
 			//resp.render('index.ejs', { potrawy: app.result, logged: true });
 			resp.redirect('/')
 		}
-		else resp.render('index.ejs', { potrawy: app.result, logged: false });
+		else resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
 
 		resp.end();
 	} else {
-		resp.sendFile(path.join(__dirname + '/views/login.html'));
+		resp.render('login', { alert: "Aby dodac nowa potrawe, musisz sie zalogowac." });
 	}
 });
 
 
+function loginValidation(req, res, next) {
+	console.log("loginValidation");
 
-app.post('/loginTo', (req, res) => {
+	var mail = req.body.email;
+	var pswd = req.body.pswd;
+
+	if (typeof mail === 'undefinded' || typeof pswd === 'undefinded' ||
+		mail === "" || pswd === "" ||
+		mail.length < 5 && mail.length > 25 ||
+		pswd.length < 5 && pswd.length > 25) {
+		res.render('login', { alert: "Nieprawidlowy login lub haslo." });
+	}
+	else {
+		console.log(mail);
+		console.log("------------------------OK");
+		next()
+	}
+}
+
+
+app.post('/loginTo', loginValidation, (req, res) => {
 
 	const zmienna = {
 		email: req.body.email,
@@ -511,18 +550,37 @@ app.post('/loginTo', (req, res) => {
 				res.end('done');
 			}
 			else {
-				res.sendFile(path.join(__dirname + '/views/login.html'));
+				res.render('login', { alert: "Nieprawidlowy adres email lub haslo." });
 			}
 
 		})
 		.catch(error => {
 			console.log(error);
+			res.render('login', { alert: "Nieprawidlowy adres email lub haslo." });
 		});
 
 });
 
+function registerValidation(req, res, next) {
+	console.log("registerValidation");
 
-app.post('/registerTo', (req, res) => {
+	var mail = req.body.email;
+	var pswd = req.body.pswd;
+
+	if (typeof mail === 'undefinded' || typeof pswd === 'undefinded' ||
+		mail === "" || pswd === "" ||
+		mail.length < 5 && mail.length > 25 ||
+		pswd.length < 5 && pswd.length > 25) {
+		res.render('register', { alert: "Nieprawidlowy login lub haslo." });
+	}
+	else {
+		console.log(mail);
+		console.log("------------------------OK");
+		next()
+	}
+}
+
+app.post('/registerTo', registerValidation, (req, res) => {
 
 	const zmienna = {
 		email: req.body.email,
@@ -598,12 +656,13 @@ app.post('/registerTo', (req, res) => {
 				res.end('done');
 			}
 			else {
-				res.sendFile(path.join(__dirname + '/views/login.html'));
+				res.render('register', { alert: "Cos poszlo nie tak. Sprobuj ponownie." });
 			}
 
 		})
 		.catch(error => {
 			console.log(error);
+			res.render('register', { alert: "Cos poszlo nie tak. Sprobuj ponownie." });
 		});
 
 });
@@ -669,9 +728,37 @@ app.get('/delete/:id', (req, resp) => {
 
 		}
 	} else {
-		resp.sendFile(path.join(__dirname + '/views/login.html'));
+		resp.render('login', { alert: "Aby usunac potrawe, musisz sie zalogowac." });
 	}
 });
+
+function editPotrawaValidation(req, res, next) {
+	console.log("editPotrawaValidation");
+
+	var id = req.params.id;
+	var nazwa = req.body.nazwa;
+	var cena = req.body.cena;
+	var info =  req.body.info;
+	var kategoria =  req.body.kategoria;
+	var status =  req.body.status;
+
+	if (typeof id === 'undefinded')
+	{
+		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Cos poszlo nie tak"  });
+	}
+	else if (typeof nazwa === 'undefinded' || typeof cena === 'undefinded' || typeof info === 'undefinded' || typeof kategoria === 'undefinded' || typeof status === 'undefinded' ||
+	nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
+	nazwa.length < 5 && nazwa.length > 100 ) {
+		console.log("Nieprawidlowe dane w formularzu");
+		//res.reroute("/show/" + id);
+		res.render('edit.ejs', { potrawy: app.result, alert: "Nieprawidlowe dane w formularzu." });
+	}
+	else {
+		console.log(nazwa);
+		console.log("------------------------OK");
+		next()
+	}
+}
 
 app.route('/edit/:id')
 	.get((req, resp) => {
@@ -694,10 +781,10 @@ app.route('/edit/:id')
 
 					console.log("Pass: " + pass);
 					if (pass === true) {
-						resp.render('edit.ejs', { potrawy: app.result });
+						resp.render('edit.ejs', { potrawy: app.result, alert: "" });
 					}
 				} else {
-					resp.sendFile(path.join(__dirname + '/views/login.html'));
+					resp.render('login', { alert: "Aby edytowac potrawe, musisz sie zalogowac." });
 				}
 			})
 			.catch(error => {
@@ -705,7 +792,7 @@ app.route('/edit/:id')
 			});
 	})
 
-	.post((req, resp) => { /* cos nie tak  Cannot set headers after they are sent to the client*/
+	.post(editPotrawaValidation, (req, resp) => {
 		if (req.session.email) {
 
 			const zmienna0 = {
@@ -746,7 +833,7 @@ app.route('/edit/:id')
 				resp.end();
 			}
 		} else {
-			resp.sendFile(path.join(__dirname + '/views/login.html'));
+			resp.render('login', { alert: "Aby edytowac potrawe, musisz sie zalogowac." });
 		}
 	});
 
@@ -841,7 +928,7 @@ function editPotrawa(zmienna) {
 	})
 		.then(res => res.json())
 		.then(res =>
-			res.redirect('/') /*? */
+			res.redirect('/') 
 		)
 		.catch(error => {
 			console.log(error);

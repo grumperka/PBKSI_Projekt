@@ -53,6 +53,7 @@
 
 <body>
   <div class="jumbotron text-center" id="menu">
+
     <h2 class="display-3">Edytuj</h2>
   </div>
 
@@ -118,6 +119,13 @@
   </nav>
 
   <br />
+
+  <% if(alert != "") { %>
+    <div class="alert alert-warning" role="alert">
+      <%= alert %>
+    </div>
+    <br />
+    <% } %>
 
   <div class="container">
     <% potrawy.forEach(function(wynik) { %>
