@@ -51,7 +51,6 @@ module.exports = function (app) {
 
         var id0;
         var email0;
-        var token0;
 
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
             if (err) {
@@ -60,9 +59,6 @@ module.exports = function (app) {
             } else {
                 id0 = user.id;
                 email0 = user.email;
-                
-                /*znajdz token refresh z bd */
-
 
                 let zmienna = {
                     id: id0,
@@ -80,12 +76,9 @@ module.exports = function (app) {
         const authHeader = req.headers['authorization'];
 
         console.log("-----------------------refreshAccessTokenApi");
-        console.log("-----------------------Auth: " + authHeader);
 
         const token = authHeader && authHeader.split(' ')[1];
         if (token == null) { console.log("WESZLO PRZEZ ERROR"); return resp.json('ERROR'); }
-
-        console.log("-----------------------TOK after: " + token);
 
         var id0;
         var email0;

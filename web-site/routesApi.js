@@ -76,7 +76,6 @@ module.exports = function (app) {
         MongoClient.connect(url, function (err, db) {
             if (err) throw err;
 
-            console.log(req.body.nazwa);
 
             var zmienna =
             {
@@ -87,15 +86,13 @@ module.exports = function (app) {
                 status: req.body.status
             };
 
-            app.result.push(zmienna);
-
             var dbo = db.db("mydb");
             dbo.collection("potrawy").insertOne(zmienna, function (err, res) {
                 if (err) return res.send(err);
 
                 console.log("Dodano nowa potrawe!");
 
-                resp.json("OK");
+                resp.json(zmienna);
                 resp.end();
                 db.close();
             });
@@ -123,11 +120,9 @@ module.exports = function (app) {
         });
     });
 
-    app.route("/editPotrawyApi").post(function (req, resp) {
+    app.route("/editPotrawyApi").post(function (req, resp) { /*cos nie tak! */
         MongoClient.connect(url, function (err, db) {
             if (err) throw err;
-
-            console.log(req.body.id);
 
             var ObjectId = require('mongodb').ObjectID;
 
@@ -156,14 +151,12 @@ module.exports = function (app) {
             }, (err, result) => {
                 if (err) return resp.send(err);
 
+                resp.json("OK");
+                resp.end();
+                db.close();
             });
-
-            resp.json("OK");
-            resp.end();
-            db.close();
-
         });
-    });;
+    });
 
 }
 

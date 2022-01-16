@@ -21,8 +21,6 @@ routesAuth(app);
 const routesJWT = require("./routesJWTApi.js");
 routesJWT(app);
 
-let accessTokenList = [];
-
 var MongoClient = require('mongodb').MongoClient;
 const { response } = require('express');
 var url = "mongodb://mongo:27017/mydb";
@@ -39,13 +37,11 @@ app.listen(8080, function () {
 });
 
 app.get('/', (req, resp) => {
-	const accessToken = req.session.accessToken;
-	console.log("ACC TOK REQ 1: " + accessToken);
 
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
 			app.result = response.data;
-			console.log("Popatrz");
+			console.log("/");
 
 			if (req.session.email) {
 
@@ -53,78 +49,16 @@ app.get('/', (req, resp) => {
 					email: req.session.email
 				};
 
-				fetch('http://localhost:8080/findUserApi', {
-					method: 'POST',
-					body: JSON.stringify(zmienna),
-					headers: { 'Content-Type': 'application/json' }
-				})
-					.then(resp =>
-						resp.json()
-					)
-					.then(resp => {
-						const user = resp.odp[0];
+				let accessToken = req.session.accessToken;
 
-						var user01 = {
-							id: resp.odp[0]._id,
-							mail: resp.odp[0].email,
-							pswd: resp.odp[0].pswd,
-						};
+				let pass = handleJWT(zmienna, accessToken, req);
 
-						var refreshToken = resp.odp[0].refreshToken;
-
-						const bearer = 'Bearer ' + accessToken.toString();
-
-						//////////////////////
-						fetch('http://localhost:8080/getAccessTokenApi', {
-							method: 'POST',
-							mode: 'no-cors',
-							body: JSON.stringify(user01),
-							headers: {
-								'Content-Type': 'application/json',
-								Authorization: bearer
-							}
-						})
-							.then(resp =>
-								resp.json()
-							).then(resp => {
-								console.log("ODPOWIEDZ NA ACCESS TOKEN");
-								console.log(resp.data);
-								console.log("Widac USER?: "+user01);
-
-								const bearer = 'Bearer ' + refreshToken.toString();
-								console.log("B: "+bearer);
-
-								if (resp.data === "ERROR") {
-									fetch('http://localhost:8080/refreshAccessTokenApi', {
-										method: 'POST',
-										body: JSON.stringify(user01),
-										headers: { 
-											'Content-Type': 'application/json',
-											Authorization: bearer
-										 }
-									})
-										.then(res => res.json())
-										.then(response => {
-											console.log('ODP TOKEN: ' + response.accessToken);
-
-											let ac = response.accessToken;
-											req.session.accessToken = ac;
-											req.session.save();
-										}).catch(error => {
-											console.log(error);
-										});
-								}
-
-							})
-							.catch(error => {
-								console.log("ODPOWIEDZ NA ACCESS TOKEN ERR");
-								console.log(error);
-							});
-						/////////////////////
-
-					});
-
-				resp.render('index.ejs', { potrawy: app.result, logged: true });
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('index.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('index.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else
 				resp.render('index.ejs', { potrawy: app.result, logged: false });
@@ -141,7 +75,21 @@ app.get('/przystawki', (req, resp) => {
 			console.log("/przystawki");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -157,7 +105,21 @@ app.get('/zupy', (req, resp) => {
 			console.log("/zupy");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -173,7 +135,21 @@ app.get('/salaty', (req, resp) => {
 			console.log("/salaty");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -189,7 +165,21 @@ app.get('/makarony', (req, resp) => {
 			console.log("/makarony");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -205,7 +195,21 @@ app.get('/miesa', (req, resp) => {
 			console.log("/miesa");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -221,7 +225,21 @@ app.get('/owoceMorza', (req, resp) => {
 			console.log("/owoceMorza");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -238,7 +256,21 @@ app.get('/desery', (req, resp) => {
 			console.log("/desery");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -254,7 +286,21 @@ app.get('/dlaDzieci', (req, resp) => {
 			console.log("/dlaDzieci");
 
 			if (req.session.email) {
-				resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexCategory.ejs', { potrawy: app.result, logged: false });
 		})
@@ -270,7 +316,21 @@ app.get('/dostepne', (req, resp) => {
 			console.log("/dostepne");
 
 			if (req.session.email) {
-				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
 		})
@@ -286,7 +346,21 @@ app.get('/niedostepne', (req, resp) => {
 			console.log("/niedostepne");
 
 			if (req.session.email) {
-				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
 		})
@@ -302,7 +376,21 @@ app.get('/naZamowienie', (req, resp) => {
 			console.log("/naZamowienie");
 
 			if (req.session.email) {
-				resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: true });
+				} else {
+					resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
+				}
 			}
 			else resp.render('indexStatus.ejs', { potrawy: app.result, logged: false });
 		})
@@ -334,28 +422,42 @@ app.get('/register.html', (req, resp) => {
 app.post('/potrawy', (req, resp) => {
 	if (req.session.email) {
 
-		var zmienna =
-		{
-			nazwa: req.body.nazwa,
-			cena: req.body.cena,
-			info: req.body.info,
-			kategoria: req.body.kategoria,
-			status: req.body.status
+		const zmienna0 = {
+			email: req.session.email
 		};
 
-		fetch('http://localhost:8080/addPotrawyApi', {
-			method: 'POST',
-			body: JSON.stringify(zmienna),
-			headers: { 'Content-Type': 'application/json' }
-		})
-			.then(res => res.json())
-			.then(json => console.log(json))
-			.catch(error => {
-				console.log(error);
-			});
+		let accessToken = req.session.accessToken;
 
-		if (req.session.email) {
-			resp.render('index.ejs', { potrawy: app.result, logged: true });
+		let pass = handleJWT(zmienna0, accessToken, req);
+
+		console.log("Pass: " + pass);
+		if (pass === true) {
+
+			var zmienna =
+			{
+				nazwa: req.body.nazwa,
+				cena: req.body.cena,
+				info: req.body.info,
+				kategoria: req.body.kategoria,
+				status: req.body.status
+			};
+
+			fetch('http://localhost:8080/addPotrawyApi', {
+				method: 'POST',
+				body: JSON.stringify(zmienna),
+				headers: { 'Content-Type': 'application/json' }
+			})
+				.then(res => res.json())
+				.then(json => {
+					console.log(json);
+					app.result.push(json);
+				})
+				.catch(error => {
+					console.log(error);
+				});
+
+			//resp.render('index.ejs', { potrawy: app.result, logged: true });
+			resp.redirect('/')
 		}
 		else resp.render('index.ejs', { potrawy: app.result, logged: false });
 
@@ -517,9 +619,22 @@ app.route('/show/:id').get((req, resp) => {
 			console.log("/show");
 
 			if (req.session.email) {
-				resp.render('show.ejs', { potrawy: app.result, logged: true });
+
+				const zmienna0 = {
+					email: req.session.email
+				};
+
+				let accessToken = req.session.accessToken;
+
+				let pass = handleJWT(zmienna0, accessToken, req);
+
+				console.log("Pass: " + pass);
+				if (pass === true) {
+					resp.render('show.ejs', { potrawy: app.result, logged: true });
+				}
+				else { resp.render('show.ejs', { potrawy: app.result, logged: false }); }
 			}
-			else resp.render('show.ejs', { potrawy: app.result, logged: false });
+			else { resp.render('show.ejs', { potrawy: app.result, logged: false }); }
 		})
 		.catch(error => {
 			console.log(error);
@@ -531,16 +646,28 @@ app.get('/delete/:id', (req, resp) => {
 
 	if (req.session.email) {
 
-		axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
-			.then(response => {
-				console.log("/delete");
+		const zmienna0 = {
+			email: req.session.email
+		};
 
-				resp.redirect('/');
-			})
-			.catch(error => {
-				console.log(error);
-			});
+		let accessToken = req.session.accessToken;
 
+		let pass = handleJWT(zmienna0, accessToken, req);
+
+		console.log("Pass: " + pass);
+		if (pass === true) {
+
+			axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
+				.then(response => {
+					console.log("/delete");
+
+					resp.redirect('/');
+				})
+				.catch(error => {
+					console.log(error);
+				});
+
+		}
 	} else {
 		resp.sendFile(path.join(__dirname + '/views/login.html'));
 	}
@@ -556,7 +683,19 @@ app.route('/edit/:id')
 				console.log("/edit");
 
 				if (req.session.email) {
-					resp.render('edit.ejs', { potrawy: app.result });
+
+					const zmienna0 = {
+						email: req.session.email
+					};
+
+					let accessToken = req.session.accessToken;
+
+					let pass = handleJWT(zmienna0, accessToken, req);
+
+					console.log("Pass: " + pass);
+					if (pass === true) {
+						resp.render('edit.ejs', { potrawy: app.result });
+					}
 				} else {
 					resp.sendFile(path.join(__dirname + '/views/login.html'));
 				}
@@ -566,32 +705,145 @@ app.route('/edit/:id')
 			});
 	})
 
-	.post((req, res) => {
+	.post((req, resp) => { /* cos nie tak  Cannot set headers after they are sent to the client*/
 		if (req.session.email) {
-			var zmienna =
-			{
-				id: req.params.id,
-				nazwa: req.body.nazwa,
-				cena: req.body.cena,
-				info: req.body.info,
-				kategoria: req.body.kategoria,
-				status: req.body.status
+
+			const zmienna0 = {
+				email: req.session.email
 			};
 
-			fetch('http://localhost:8080/editPotrawyApi', {
-				method: 'POST',
-				body: JSON.stringify(zmienna),
-				headers: { 'Content-Type': 'application/json' }
-			})
-				.then(res => res.json())
-				.then(
-					res.redirect('/')
-				)
-				.catch(error => {
-					console.log(error);
-				});
+			let accessToken = req.session.accessToken;
 
+			let pass = handleJWT(zmienna0, accessToken, req);
+
+			console.log("Pass: " + pass);
+			if (pass === true) {
+
+				var zmienna =
+				{
+					id: req.params.id,
+					nazwa: req.body.nazwa,
+					cena: req.body.cena,
+					info: req.body.info,
+					kategoria: req.body.kategoria,
+					status: req.body.status
+				};
+
+				fetch('http://localhost:8080/editPotrawyApi', {
+					method: 'POST',
+					body: JSON.stringify(zmienna),
+					headers: { 'Content-Type': 'application/json' }
+				})
+					.then(res => res.json())
+					.then(res =>
+						console.log(res)
+					)
+					.catch(error => {
+						console.log(error);
+					});
+
+				resp.redirect('/')
+				resp.end();
+			}
 		} else {
 			resp.sendFile(path.join(__dirname + '/views/login.html'));
 		}
 	});
+
+function handleJWT(zmienna, accessToken, req) {
+
+	console.log("handleJWT " + zmienna);
+
+	fetch('http://localhost:8080/findUserApi', {
+		method: 'POST',
+		body: JSON.stringify(zmienna),
+		headers: { 'Content-Type': 'application/json' }
+	})
+		.then(resp =>
+			resp.json()
+		)
+		.then(resp => {
+
+			var user01 = {
+				id: resp.odp[0]._id,
+				mail: resp.odp[0].email,
+				pswd: resp.odp[0].pswd,
+			};
+
+			var refreshToken = resp.odp[0].refreshToken;
+
+			const bearer = 'Bearer ' + accessToken.toString();
+
+			//////////////////////
+			fetch('http://localhost:8080/getAccessTokenApi', {
+				method: 'POST',
+				body: JSON.stringify(user01),
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: bearer
+				}
+			})
+				.then(resp =>
+					resp.json()
+				).then(resp => {
+					console.log("ODPOWIEDZ NA ACCESS TOKEN");
+					console.log(resp.data);
+					console.log("Widac USER?: " + user01);
+
+					const bearer = 'Bearer ' + refreshToken.toString();
+					console.log("B: " + bearer);
+
+					if (resp.data === "ERROR") {
+						return fetch('http://localhost:8080/refreshAccessTokenApi', {
+							method: 'POST',
+							body: JSON.stringify(user01),
+							headers: {
+								'Content-Type': 'application/json',
+								Authorization: bearer
+							}
+						})
+							.then(res => res.json())
+							.then(response => {
+								console.log('ODP TOKEN: ' + response.accessToken);
+
+								let ac = response.accessToken;
+								req.session.accessToken = ac;
+								req.session.save();
+
+							}).catch(error => {
+								console.log(error);
+								return false;
+							});
+					}
+					else { return false; }
+
+				})
+				.catch(error => {
+					console.log("ODPOWIEDZ NA ACCESS TOKEN ERR");
+					console.log(error);
+					return false;
+				});
+		})
+		.catch(error => {
+			console.log("USER NOT FOUND");
+			console.log(error);
+			return false;
+		});
+
+	return true;
+}
+
+function editPotrawa(zmienna) {
+	fetch('http://localhost:8080/editPotrawyApi', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', },
+		body: JSON.stringify(zmienna)
+	})
+		.then(res => res.json())
+		.then(res =>
+			res.redirect('/') /*? */
+		)
+		.catch(error => {
+			console.log(error);
+		});
+}
