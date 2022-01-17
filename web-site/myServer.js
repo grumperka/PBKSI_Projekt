@@ -36,7 +36,7 @@ app.listen(8080, function () {
 	console.log('Nasluchujemy z portu 8080')
 });
 
-app.get('/', (req, resp) => {
+app.get('/', (req, res) => {
 
 	axios.get('http://localhost:8080/allPotrawyApi')
 		.then(response => {
@@ -55,13 +55,13 @@ app.get('/', (req, resp) => {
 
 				console.log("Pass: " + pass);
 				if (pass === true) {
-					resp.render('index.ejs', { potrawy: app.result, logged: true, alert: "" });
+					res.render('index.ejs', { potrawy: app.result, logged: true, alert: "" });
 				} else {
-					resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
+					res.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
 				}
 			}
 			else
-				resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
+				res.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
 		})
 		.catch(error => {
 			console.log(error);
@@ -423,14 +423,14 @@ function addPotrawaValidation(req, res, next) {
 
 	var nazwa = req.body.nazwa;
 	var cena = req.body.cena;
-	var info =  req.body.info;
-	var kategoria =  req.body.kategoria;
-	var status =  req.body.status;
+	var info = req.body.info;
+	var kategoria = req.body.kategoria;
+	var status = req.body.status;
 
 	if (typeof nazwa === 'undefinded' || typeof cena === 'undefinded' || typeof info === 'undefinded' || typeof kategoria === 'undefinded' || typeof status === 'undefinded' ||
-	nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
-	nazwa.length < 5 && nazwa.length > 100 ) {
-		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Nieprawidlowe dane w formularzu."  });
+		nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
+		nazwa.length < 5 && nazwa.length > 100) {
+		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Nieprawidlowe dane w formularzu." });
 	}
 	else {
 		console.log(nazwa);
@@ -439,53 +439,37 @@ function addPotrawaValidation(req, res, next) {
 	}
 }
 
-app.post('/potrawy', addPotrawaValidation ,(req, resp) => {
-	if (req.session.email) {
+app.post('/potrawy', addPotrawaValidation, authorizationMiddleware, (req, res) => {
 
-		const zmienna0 = {
-			email: req.session.email
-		};
+	var zmienna =
+	{
+		nazwa: req.body.nazwa,
+		cena: req.body.cena,
+		info: req.body.info,
+		kategoria: req.body.kategoria,
+		status: req.body.status
+	};
 
-		let accessToken = req.session.accessToken;
+	fetch('http://localhost:8080/addPotrawyApi', {
+		method: 'POST',
+		body: JSON.stringify(zmienna),
+		headers: { 'Content-Type': 'application/json' }
+	})
+		.then(res => res.json())
+		.then(json => {
+			console.log(json);
+			app.result.push(json);
+		})
+		.catch(error => {
+			console.log(error);
+			res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Cos poszlo nie tak. Sprobuj ponownie." });
+		});
 
-		let pass = handleJWT(zmienna0, accessToken, req);
+	res.redirect('/')
 
-		console.log("Pass: " + pass);
-		if (pass === true) {
-
-			var zmienna =
-			{
-				nazwa: req.body.nazwa,
-				cena: req.body.cena,
-				info: req.body.info,
-				kategoria: req.body.kategoria,
-				status: req.body.status
-			};
-
-			fetch('http://localhost:8080/addPotrawyApi', {
-				method: 'POST',
-				body: JSON.stringify(zmienna),
-				headers: { 'Content-Type': 'application/json' }
-			})
-				.then(res => res.json())
-				.then(json => {
-					console.log(json);
-					app.result.push(json);
-				})
-				.catch(error => {
-					console.log(error);
-				});
-
-			//resp.render('index.ejs', { potrawy: app.result, logged: true });
-			resp.redirect('/')
-		}
-		else resp.render('index.ejs', { potrawy: app.result, logged: false, alert: "" });
-
-		resp.end();
-	} else {
-		resp.render('login', { alert: "Aby dodac nowa potrawe, musisz sie zalogowac." });
-	}
-});
+	res.end();
+}
+);
 
 
 function loginValidation(req, res, next) {
@@ -602,11 +586,6 @@ app.post('/registerTo', registerValidation, (req, res) => {
 			if (response.data != "ERROR") {
 				req.session.email = response.data.email;
 
-				/* TUTAJ ACCESS TOKEN */
-
-				//FIND_USER
-				//Generate_Token
-
 				const zmienna = {
 					email: req.session.email,
 					pswd: response.data.pswd
@@ -649,8 +628,6 @@ app.post('/registerTo', registerValidation, (req, res) => {
 
 					});
 
-
-				/* TUTAJ ACCESS TOKEN */
 				app.result = response.data;
 				res.render('indexLogin.ejs', { users: app.result, logged: true });
 				res.end('done');
@@ -669,7 +646,7 @@ app.post('/registerTo', registerValidation, (req, res) => {
 
 
 
-app.route('/show/:id').get((req, resp) => {
+app.route('/show/:id').get(idMiddleware,(req, resp) => { 
 	var id1 = req.params.id;
 
 	axios.get('http://localhost:8080/potrawaApi/' + id1)
@@ -701,8 +678,116 @@ app.route('/show/:id').get((req, resp) => {
 
 });
 
-app.get('/delete/:id', (req, resp) => {
+app.get('/delete/:id', authorizationMiddleware, idMiddleware, (req, res) => { 
+	axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
+		.then(response => {
+			console.log("/delete");
 
+			res.redirect('/');
+		})
+		.catch(error => {
+			console.log(error);
+			res.redirect('/show/' + req.params.id);
+		});
+});
+
+function editPotrawaValidation(req, res, next) {
+	console.log("editPotrawaValidation");
+
+	var id = req.params.id;
+	var nazwa = req.body.nazwa;
+	var cena = req.body.cena;
+	var info = req.body.info;
+	var kategoria = req.body.kategoria;
+	var status = req.body.status;
+
+	if (typeof id === 'undefinded' || id === "") {
+		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Cos poszlo nie tak" });
+	}
+	else if (typeof nazwa === 'undefinded' || typeof cena === 'undefinded' || typeof info === 'undefinded' || typeof kategoria === 'undefinded' || typeof status === 'undefinded' ||
+		nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
+		nazwa.length < 5 && nazwa.length > 100) {
+		console.log("Nieprawidlowe dane w formularzu");
+		res.render('edit.ejs', { potrawy: app.result, alert: "Nieprawidlowe dane w formularzu." });
+	}
+	else {
+		console.log(nazwa);
+		console.log("------------------------OK");
+		next()
+	}
+}
+
+app.route('/edit/:id') 
+	.get(authorizationMiddleware, idMiddleware, (req, res) => {
+		console.log("Edytujemy potrawe!");
+		var id1 = req.params.id;
+
+		axios.get('http://localhost:8080/potrawaApi/' + id1)
+			.then(response => {
+				app.result = response.data;
+				console.log("/edit");
+				res.render('edit.ejs', { potrawy: app.result, alert: "" });
+
+			})
+			.catch(error => {
+				console.log(error);
+				res.redirect('/show/' + req.params.id);
+			});
+	})
+
+	.post(editPotrawaValidation, authorizationMiddleware, (req, res) => {
+
+		var zmienna =
+		{
+			id: req.params.id,
+			nazwa: req.body.nazwa,
+			cena: req.body.cena,
+			info: req.body.info,
+			kategoria: req.body.kategoria,
+			status: req.body.status
+		};
+
+		fetch('http://localhost:8080/editPotrawyApi', {
+			method: 'POST',
+			body: JSON.stringify(zmienna),
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then(response => response.json())
+			.then(response => {
+				console.log(response);
+
+				res.redirect('/')
+				res.end();
+			})
+			.catch(error => {
+				console.log(error);
+				res.render('edit.ejs', { potrawy: app.result, alert: "Cos poszlo nie tak. Sprobuj ponownie." });
+				res.end();
+			});
+
+
+	});
+
+function idMiddleware(req, res, next) {
+	console.log("idMiddleware");
+
+	var id = req.params.id;
+
+	if (typeof id === 'undefinded' || id === "") {
+		if (req.session.email) {
+			res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Cos poszlo nie tak" });
+		} else {
+			res.render('index.ejs', { potrawy: app.result, logged: false, alert: "Cos poszlo nie tak" });
+		}
+	}
+	else {
+		console.log(id);
+		console.log("------------id----------OK");
+		next()
+	}
+}
+
+function authorizationMiddleware(req, res, next) {
 	if (req.session.email) {
 
 		const zmienna0 = {
@@ -713,129 +798,17 @@ app.get('/delete/:id', (req, resp) => {
 
 		let pass = handleJWT(zmienna0, accessToken, req);
 
-		console.log("Pass: " + pass);
-		if (pass === true) {
-
-			axios.get('http://localhost:8080/deletePotrawyApi/' + req.params.id)
-				.then(response => {
-					console.log("/delete");
-
-					resp.redirect('/');
-				})
-				.catch(error => {
-					console.log(error);
-				});
-
+		if (pass == true) {
+			console.log("Pass" + pass);
+			next()
+			return
 		}
-	} else {
-		resp.render('login', { alert: "Aby usunac potrawe, musisz sie zalogowac." });
-	}
-});
 
-function editPotrawaValidation(req, res, next) {
-	console.log("editPotrawaValidation");
-
-	var id = req.params.id;
-	var nazwa = req.body.nazwa;
-	var cena = req.body.cena;
-	var info =  req.body.info;
-	var kategoria =  req.body.kategoria;
-	var status =  req.body.status;
-
-	if (typeof id === 'undefinded')
-	{
-		res.render('index.ejs', { potrawy: app.result, logged: true, alert: "Cos poszlo nie tak"  });
+		res.render('login', { alert: "By wykonac akcje, musisz byc zalogowany." });
 	}
-	else if (typeof nazwa === 'undefinded' || typeof cena === 'undefinded' || typeof info === 'undefinded' || typeof kategoria === 'undefinded' || typeof status === 'undefinded' ||
-	nazwa === "" || cena === "" || info === "" || kategoria === "" || status === "" ||
-	nazwa.length < 5 && nazwa.length > 100 ) {
-		console.log("Nieprawidlowe dane w formularzu");
-		//res.reroute("/show/" + id);
-		res.render('edit.ejs', { potrawy: app.result, alert: "Nieprawidlowe dane w formularzu." });
-	}
-	else {
-		console.log(nazwa);
-		console.log("------------------------OK");
-		next()
-	}
+	res.render('login', { alert: "By wykonac akcje, musisz byc zalogowany." });
 }
 
-app.route('/edit/:id')
-	.get((req, resp) => {
-		console.log("Edytujemy potrawe!");
-		var id1 = req.params.id;
-		axios.get('http://localhost:8080/potrawaApi/' + id1)
-			.then(response => {
-				app.result = response.data;
-				console.log("/edit");
-
-				if (req.session.email) {
-
-					const zmienna0 = {
-						email: req.session.email
-					};
-
-					let accessToken = req.session.accessToken;
-
-					let pass = handleJWT(zmienna0, accessToken, req);
-
-					console.log("Pass: " + pass);
-					if (pass === true) {
-						resp.render('edit.ejs', { potrawy: app.result, alert: "" });
-					}
-				} else {
-					resp.render('login', { alert: "Aby edytowac potrawe, musisz sie zalogowac." });
-				}
-			})
-			.catch(error => {
-				console.log(error);
-			});
-	})
-
-	.post(editPotrawaValidation, (req, resp) => {
-		if (req.session.email) {
-
-			const zmienna0 = {
-				email: req.session.email
-			};
-
-			let accessToken = req.session.accessToken;
-
-			let pass = handleJWT(zmienna0, accessToken, req);
-
-			console.log("Pass: " + pass);
-			if (pass === true) {
-
-				var zmienna =
-				{
-					id: req.params.id,
-					nazwa: req.body.nazwa,
-					cena: req.body.cena,
-					info: req.body.info,
-					kategoria: req.body.kategoria,
-					status: req.body.status
-				};
-
-				fetch('http://localhost:8080/editPotrawyApi', {
-					method: 'POST',
-					body: JSON.stringify(zmienna),
-					headers: { 'Content-Type': 'application/json' }
-				})
-					.then(res => res.json())
-					.then(res =>
-						console.log(res)
-					)
-					.catch(error => {
-						console.log(error);
-					});
-
-				resp.redirect('/')
-				resp.end();
-			}
-		} else {
-			resp.render('login', { alert: "Aby edytowac potrawe, musisz sie zalogowac." });
-		}
-	});
 
 function handleJWT(zmienna, accessToken, req) {
 
@@ -918,19 +891,4 @@ function handleJWT(zmienna, accessToken, req) {
 		});
 
 	return true;
-}
-
-function editPotrawa(zmienna) {
-	fetch('http://localhost:8080/editPotrawyApi', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json', },
-		body: JSON.stringify(zmienna)
-	})
-		.then(res => res.json())
-		.then(res =>
-			res.redirect('/') 
-		)
-		.catch(error => {
-			console.log(error);
-		});
 }
