@@ -98,7 +98,7 @@ module.exports = function (app) {
                     pswd: password0
                 }
 
-                const accessToken = generateAccessToken(zmienna, '30s');
+                const accessToken = generateAccessToken(zmienna, '15s');
 
                 resp.json({ accessToken: accessToken });
                 resp.end();

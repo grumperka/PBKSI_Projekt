@@ -1,0 +1,26 @@
+Wymagane programy:
+- Docker Desktop
+- Visual Studio Code (opcjonalnie, ale najwygodniejszy)
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Instrukcja uruchomieniowa
+1) Z poziomu wiersza poleceń wchodzimy do głównego folderu projektu - PBKSI_PROJECT
+2) Uruchamiamy polecenie "docker-compose up"
+3) W programie Docker Desktop sprawdzamy, czy kontener o nazwie "pbksi_project" został utworzony
+4) Jeżeli kontener jest uruchomiony, otwierami wiersz polecenia dla mongo (CLI) i wykonujemy polecenia z pliku "init_MongoDB.txt"
+5) W wyszukiwarce wprowadzamy adres url - " localhost:8080 "
+6) Program jest gotowy do testowania
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Informacje dodatkowe:
+W bazie danych istnieje już 2 użytkowników:
+
+email = admin@mail.com
+hasło = password
+
+--------------------         ----------------------------
+
+email = user@mail.com
+hasło = password
